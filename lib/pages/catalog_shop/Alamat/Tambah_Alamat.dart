@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:variegata_app/pages/catalog_shop/Alamat/Alamat.dart';
 import 'dart:convert';
 import 'package:variegata_app/pages/catalog_shop/cart.dart';
-import 'package:variegata_app/pages/catalog_shop/checkout.dart';
-
-class AlamatModel {
-  final String alamat;
-  final String namaPenerima;
-  final String nomorTelepon;
-  final String catatan;
-
-  AlamatModel({
-    required this.alamat,
-    required this.namaPenerima,
-    required this.nomorTelepon,
-    required this.catatan,
-  });
-}
 
 class TambahAlamat extends StatefulWidget {
   final List<Map<String, dynamic>> selectedProducts;
-  TambahAlamat({Key? key, required this.currentAddress, required this.selectedProducts});
+  TambahAlamat(
+      {Key? key,
+        required this.currentAddress,
+        required this.selectedProducts});
   final String currentAddress;
 
   @override
@@ -97,19 +86,29 @@ class _TambahAlamatState extends State<TambahAlamat> {
     );
 
     if (response.statusCode == 200) {
-      final AlamatModel alamatModel = AlamatModel(
-        alamat: alamat,
-        namaPenerima: namaPenerima,
-        nomorTelepon: nomorTelepon,
-        catatan: catatan,
-      );
-
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Checkout(alamatModel: alamatModel,
-              selectedProducts: widget.selectedProducts,
-          ),
-        ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Sukses'),
+            content: Text('Alamat Anda sudah terbuat.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Lanjut'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Tutup dialog sukses
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => AlamatAll(
+                        selectedProducts: widget.selectedProducts,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
       );
     } else {
       showDialog(
@@ -228,7 +227,7 @@ class _TambahAlamatState extends State<TambahAlamat> {
                           height: 10,
                         ),
                         const Text(
-                          "Pilih titik lokasi yang sesuai",
+                          "Titik lokasi anda saat ini",
                           style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 14,

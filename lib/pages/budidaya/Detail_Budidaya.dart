@@ -76,7 +76,6 @@ class _DetailPlantState extends State<DetailPlant>
                   width: MediaQuery.of(context).size.width,
                   child: CachedNetworkImage(
                     imageUrl: 'https://variegata.my.id/storage/${widget.product['image_bg']}',
-                    placeholder: (context, url) => CircularProgressIndicator(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                     fit: BoxFit.cover,
                   ),

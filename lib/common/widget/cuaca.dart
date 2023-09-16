@@ -185,7 +185,7 @@ class _CuacaState extends State<Cuaca> {
                       const Color(0xFF939393).withOpacity(0.4), BlendMode.color),
                   fit: BoxFit.cover),
             ),
-            height: 191,
+            height: 210,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 17),
               child: Column(
@@ -302,7 +302,7 @@ class _CuacaState extends State<Cuaca> {
           )
         : ShimmerWidget(
             width: double.infinity,
-            height: 191,
+            height: 210,
             // radius: 0,
           );
   }

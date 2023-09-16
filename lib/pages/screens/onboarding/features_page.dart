@@ -13,7 +13,7 @@ class FeaturesPage extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 10),
                 width: MediaQuery.of(context).size.width,
-                height: 400,
+                height: 450,
                 decoration: const BoxDecoration(),
                 child: Image(
                   image: AssetImage('assets/img/onboarding/features.png'),

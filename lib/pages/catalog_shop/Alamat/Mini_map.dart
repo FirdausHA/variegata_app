@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:variegata_app/pages/catalog_shop/Adresess.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat/Tambah_Alamat.dart';
 
-import '../../common/widget/mapFunction.dart';
+import '../../../common/widget/mapFunction.dart';
 
 const MAPBOX_ACCESS_TOKEN =
     'pk.eyJ1IjoibWlrYWEyOSIsImEiOiJjbGxkcXBsNTQwYncyM2dxdjFqN2VuZGFwIn0.j5VpcKbH6WjqW0JiHfD-YQ';

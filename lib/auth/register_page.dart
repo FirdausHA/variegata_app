@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:variegata_app/Services/auth_services.dart';
@@ -17,47 +16,61 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   bool _obscureText = true;
-
   String _email = '';
   String _password = '';
   String _name = '';
+  bool _isLoading = false;
 
   createAccountPressed() async {
-    bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(_email);
-    if (emailValid) {
-      http.Response response =
-          await AuthServices.register(_name, _email, _password);
-      Map responseMap = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        Navigator.push(
+    if (_email.isNotEmpty && _password.isNotEmpty && _name.isNotEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      bool emailValid = RegExp(
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(_email);
+
+      if (emailValid) {
+        http.Response response =
+        await AuthServices.register(_name, _email, _password);
+        Map responseMap = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          final String token = responseMap['token'];
+          await AuthServices.saveTokenToLocalStorage(token);
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (BuildContext context) => const BotNavbar(),
-            ));
+            ),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          errorSnackBar(context, responseMap.values.first[0]);
+        }
       } else {
-        errorSnackBar(context, responseMap.values.first[0]);
+        setState(() {
+          _isLoading = false;
+        });
+        errorSnackBar(context, 'Email is not valid');
       }
     } else {
-      errorSnackBar(context, 'email not valid');
+      errorSnackBar(context, 'Please fill in all required fields');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    final currentWidth = MediaQuery.of(context).size.width;
-    double currentHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: SizedBox(
-          height: currentHeight,
+          height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
               Positioned(
                 right: 0,
-                // top: 0,
                 child: Image.asset(
                   "assets/img/VectorRegister.png",
                   width: 242,
@@ -250,7 +263,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                         ),
                       ),
-                      RoundedButton(
+                      _isLoading
+                          ? CircularProgressIndicator() // Tampilkan loading jika sedang memproses
+                          : RoundedButton(
                         btnText: 'Create Account',
                         onBtnPressed: () => createAccountPressed(),
                       ),
@@ -266,7 +281,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
+                              const EdgeInsets.symmetric(horizontal: 15),
                               child: Text(
                                 "Or",
                                 style: TextStyle(
@@ -335,7 +350,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => LoginPage(),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:variegata_app/pages/catalog_shop/Checkout/checkout_product.dart';
 import 'dart:convert';
 
-import 'package:variegata_app/pages/catalog_shop/Mini_map.dart';
-import 'package:variegata_app/pages/catalog_shop/Order.dart';
 import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -13,6 +12,20 @@ class Cart extends StatefulWidget {
 
   @override
   State<Cart> createState() => _CartState();
+}
+
+class Product {
+  final String name;
+  final int quantity;
+  final String image;
+  final double price;
+
+  Product({
+    required this.name,
+    required this.quantity,
+    required this.image,
+    required this.price,
+  });
 }
 
 class _CartState extends State<Cart> {
@@ -191,26 +204,26 @@ class _CartState extends State<Cart> {
     selectedProducts.clear();
     for (var cartItem in cartItems) {
       if (cartItem['isChecked']) {
+        final productId = cartItem['product']['id'];
+        final quantity = productQuantities[productId] ?? 1;
+        final name = cartItem['product']['name'];
+        final image = cartItem['product']['image'];
+        final price = double.parse(cartItem['product']['price']);
+
         selectedProducts.add({
-          'name': cartItem['product']['name'],
-          'quantity': productQuantities[cartItem['product']['id']] ?? 1,
-          'image': cartItem['product']['image'],
-          'price': cartItem['product']['price'],
+          'name': name,
+          'quantity': quantity,
+          'image': image,
+          'price': price.toStringAsFixed(2), // Mengonversi harga menjadi String dengan 2 desimal
         });
       }
     }
 
     if (selectedProducts.isNotEmpty) {
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => Order(selectedProducts: selectedProducts),
-      //   ),
-      // );
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MiniMap(selectedProducts: selectedProducts),
+          builder: (context) => CheckoutProduct(selectedProducts: selectedProducts),
         ),
       );
     } else {
@@ -219,6 +232,8 @@ class _CartState extends State<Cart> {
       );
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +250,7 @@ class _CartState extends State<Cart> {
           icon: Icon(Icons.arrow_back),
           color: Color(0xFF33363F),
           onPressed: () {
-            Navigator.pop(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => KatalogShop(),
@@ -375,8 +390,8 @@ class _CartState extends State<Cart> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CachedNetworkImage(
-                                    imageUrl: 'https://variegata.my.id/storage/${cartItem['product']['image']}',
-                                    placeholder: (context, url) => CircularProgressIndicator(),
+                                    imageUrl:
+                                    'https://variegata.my.id/storage/${cartItem['product']['image']}',
                                     errorWidget: (context, url, error) => Icon(Icons.error),
                                     width: 85,
                                     height: 85,

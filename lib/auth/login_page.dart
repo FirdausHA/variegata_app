@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:variegata_app/Services/auth_services.dart';
 import 'package:variegata_app/Services/globals.dart';
 import 'package:variegata_app/Services/rounded_button.dart';
 import 'package:variegata_app/auth/register_page.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
-
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -20,29 +19,62 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
   String _email = '';
   String _password = '';
+  bool _isLoading = false;
 
-  loginPressed() async {
-    if (_email.isNotEmpty && _password.isNotEmpty) {
-      http.Response response = await AuthServices.login(_email, _password);
-      Map responseMap = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => const BotNavbar(),
-            ));
-      } else {
-        errorSnackBar(context, responseMap.values.first);
-      }
-    } else {
-      errorSnackBar(context, 'enter all required fields');
+  @override
+  void initState() {
+    super.initState();
+    checkToken();
+  }
+
+  checkToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const BotNavbar(),
+        ),
+      );
     }
   }
 
-  horizontalMode() {}
+  loginPressed() async {
+    if (_email.isNotEmpty && _password.isNotEmpty && !_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      http.Response response = await AuthServices.login(_email, _password);
+      Map responseMap = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final String token = responseMap['token'];
+        await AuthServices.saveTokenToLocalStorage(token);
+
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('token', token);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const BotNavbar(),
+          ),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        errorSnackBar(context, "Email atau password anda salah. Mohon periksa kembali.");
+      }
+    } else if (_isLoading) {
+      // Tidak melakukan apa-apa jika tombol sedang dalam mode loading
+    } else {
+      errorSnackBar(context, 'Isi Email dan Password anda terlebih dahulu');
+    }
+  }
 
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
     final currentWidth = MediaQuery.of(context).size.width;
     double currentHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -54,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Positioned(
                   right: 0,
-                  // top: 0,
                   child: Image.asset(
                     "assets/img/vector-login.png",
                     height: 196,
@@ -118,7 +149,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        //email
                         Container(
                           margin: EdgeInsets.only(top: 13, bottom: 30),
                           width: 350,
@@ -127,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Color(0xFFBBD6B8)),
+                                BorderSide(color: Color(0xFFBBD6B8)),
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -163,7 +193,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        //password
                         Container(
                           margin: EdgeInsets.only(top: 13, bottom: 30),
                           width: 350,
@@ -173,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Color(0xFFBBD6B8)),
+                                BorderSide(color: Color(0xFFBBD6B8)),
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -220,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                const EdgeInsets.symmetric(horizontal: 15),
                                 child: Text(
                                   "Or",
                                   style: TextStyle(

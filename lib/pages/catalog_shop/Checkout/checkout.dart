@@ -1,34 +1,32 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:variegata_app/pages/catalog_shop/Adresess.dart';
-import 'package:variegata_app/pages/catalog_shop/Order.dart';
-import 'package:variegata_app/pages/catalog_shop/ganti_alamat.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat/Alamat.dart';
+import 'package:variegata_app/pages/catalog_shop/Checkout/Detail_pesanan_checkout.dart';
 import 'package:variegata_app/pages/catalog_shop/midtrans_screen/SnapScreen.dart';
 
 class Checkout extends StatefulWidget {
-  final AlamatModel alamatModel;
   final List<Map<String, dynamic>> selectedProducts;
+  final Map<String, dynamic> selectedAddress;
 
-  Checkout({Key? key, required this.alamatModel, required this.selectedProducts})
-      : super(key: key);
+  Checkout({required this.selectedProducts, required this.selectedAddress});
 
   @override
   State<Checkout> createState() => _CheckoutState();
 }
 
-List<String> options = ['Option 1', 'Option 2'];
-
 class _CheckoutState extends State<Checkout> {
-  String currentOption = options[0];
-
   Map<String, dynamic> get firstSelectedProduct =>
       widget.selectedProducts.isNotEmpty ? widget.selectedProducts.first : {};
 
   double calculateTotalPrice() {
     double totalPrice = 0.0;
     for (var product in widget.selectedProducts) {
-      double price = double.parse(product['price'] ?? '0.0'); // Mengonversi ke double
+      // Menggunakan fungsi double.tryParse untuk menghindari kesalahan jika 'price' bukan String yang valid
+      double price = double.tryParse(product['price']?.toString() ?? '0.0') ?? 0.0;
       int quantity = product['quantity'] ?? 0;
       totalPrice += (price * quantity);
     }
@@ -43,6 +41,59 @@ class _CheckoutState extends State<Checkout> {
   String formatTotalHarga(double totalHarga) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp.', decimalDigits: 0)
         .format(totalHarga);
+  }
+
+  Future<String?> fetchSnapToken(String qty) async {
+    final url = Uri.parse('https://variegata.my.id/api/checkout');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? authToken = prefs.getString('auth_token');
+
+      if (authToken == null) {
+        print('Token tidak ditemukan di penyimpanan lokal.');
+        return null;
+      }
+
+      // Mengambil id dari selectedAddress
+      final addressesId = widget.selectedAddress['id'];
+
+      // Mengambil id dari produk pertama dalam selectedProducts
+      // final productId = widget.selectedProducts.isNotEmpty ? widget.selectedProducts.first['id'] : null;
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "qty": qty,
+          "total_price": calculateTotalPrice().toStringAsFixed(2), // Menggunakan total harga yang telah dihitung
+          "addresses_id": addressesId, // Menggunakan id dari selectedAddress
+          "product_id": 1, // Menggunakan id dari produk pertama dalam selectedProducts
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['snapToken'];
+      } else if (response.statusCode == 422) {
+        final responseData = json.decode(response.body);
+        final errorMessage = responseData['message'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal mengambil snapToken: $errorMessage'),
+          ),
+        );
+        return null;
+      } else {
+        print('Gagal mengambil snapToken: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
   }
 
   @override
@@ -90,7 +141,10 @@ class _CheckoutState extends State<Checkout> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => GantiAlamat()),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AlamatAll(selectedProducts: widget.selectedProducts),
+                        ),
                       );
                     },
                     child: Container(
@@ -134,7 +188,7 @@ class _CheckoutState extends State<Checkout> {
                               child: Row(
                                 children: [
                                   Text(
-                                    widget.alamatModel.namaPenerima,
+                                    widget.selectedAddress['nama'],
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 17,
@@ -146,7 +200,7 @@ class _CheckoutState extends State<Checkout> {
                                   ),
                                   Center(
                                     child: Text(
-                                      widget.alamatModel.nomorTelepon,
+                                      widget.selectedAddress['nomor_telepon'],
                                       style: TextStyle(
                                         color: Color(0xFF505050),
                                         fontSize: 17,
@@ -164,7 +218,7 @@ class _CheckoutState extends State<Checkout> {
                           Container(
                             width: 240,
                             child: Text(
-                              widget.alamatModel.alamat,
+                              widget.selectedAddress['alamat'],
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -206,7 +260,8 @@ class _CheckoutState extends State<Checkout> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Order(selectedProducts: widget.selectedProducts),
+                          builder: (context) =>
+                              Order(selectedProducts: widget.selectedProducts),
                         ),
                       );
                     },
@@ -342,7 +397,7 @@ class _CheckoutState extends State<Checkout> {
                                       height: 5,
                                     ),
                                     Text(
-                                      formatPrice(double.parse(firstSelectedProduct['price'] ?? '0.0')), // Menggunakan fungsi formatPrice
+                                      formatPrice(double.parse(firstSelectedProduct['price'] ?? '0.0')),
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 15,
@@ -403,8 +458,7 @@ class _CheckoutState extends State<Checkout> {
                             ),
                           ),
                           Text(
-                            formatTotalHarga(
-                                calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                            formatTotalHarga(calculateTotalPrice()),
                             style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 16,
@@ -435,8 +489,7 @@ class _CheckoutState extends State<Checkout> {
                             ),
                           ),
                           Text(
-                            formatTotalHarga(
-                                calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                            formatTotalHarga(calculateTotalPrice()),
                             style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 17,
@@ -483,8 +536,7 @@ class _CheckoutState extends State<Checkout> {
                       height: 5,
                     ),
                     Text(
-                      formatTotalHarga(
-                          calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                      formatTotalHarga(calculateTotalPrice()),
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 21,
@@ -494,13 +546,22 @@ class _CheckoutState extends State<Checkout> {
                   ],
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
+                  onTap: () async {
+                    final snapToken = await fetchSnapToken(widget.selectedProducts.length.toString());
+                    if (snapToken != null) {
+                      Navigator.push(
+                        context,
                         MaterialPageRoute(
-                        builder: (context) => Snap_screen(snap_token: snap_token),
-                      ),
-                    );
+                          builder: (context) => Snap_screen(snap_token: snapToken),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Gagal mengambil snap_token'),
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     width: 136,

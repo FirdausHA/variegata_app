@@ -4,8 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 import 'package:http/http.dart' as http;
-import 'package:variegata_app/pages/catalog_shop/Example%20cart.dart';
 import 'package:variegata_app/pages/catalog_shop/Example_Katalog.dart';
+import 'package:variegata_app/pages/catalog_shop/Katalog.dart';
 import 'package:variegata_app/pages/catalog_shop/cart.dart';
 
 class DetailProduk extends StatefulWidget {
@@ -42,48 +42,71 @@ class _DetailProdukState extends State<DetailProduk> {
   }
 
   Future<void> _addToCart() async {
-    final productId = widget.product['id']; // Ganti dengan id produk yang sesuai
-    final quantity = 1; // Ganti dengan jumlah yang sesuai
+    final productId = widget.product['id'];
+    final quantity = 1;
 
-    final response = await http.post(
-      Uri.parse('https://variegata.my.id/api/add-to-cart'), // Ganti dengan URL API Anda
-      body: {
-        'product_id': productId.toString(),
-        'quantity': quantity.toString(),
-      },
-    );
+    // Mengambil informasi stok produk dari widget.product
+    final availableStock = int.tryParse(widget.product['stock']) ?? 0;
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      if (responseData.containsKey('message')) {
-        final message = responseData['message'];
+    // Memeriksa apakah stok tersedia
+    if (availableStock >= quantity) {
+      final response = await http.post(
+        Uri.parse('https://variegata.my.id/api/add-to-cart'),
+        body: {
+          'product_id': productId.toString(),
+          'quantity': quantity.toString(),
+        },
+      );
 
-        if (message == 'Product is already in the cart') {
-          // Tampilkan pesan "Produk sudah ada di keranjang" kepada pengguna
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Produk sudah ada di dalam keranjang'),
-            ),
-          );
-        } else {
-          // Tampilkan pesan "Produk berhasil ditambahkan" jika tidak ada pesan lain
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Produk berhasil ditambahkan'),
-            ),
-          );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('message')) {
+          final message = responseData['message'];
+
+          if (message == 'Product is already in the cart') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Produk sudah ada di dalam keranjang'),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Produk berhasil ditambahkan'),
+              ),
+            );
+          }
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal menambahkan produk ke keranjang'),
+          ),
+        );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal menambahkan produk ke keranjang'),
+          content: Text('Stok produk tidak mencukupi'),
         ),
       );
     }
   }
 
 
+  String formatPrice(String price) {
+    // Ubah string harga menjadi tipe double
+    double parsedPrice = double.tryParse(price) ?? 0.0;
+
+    // Format angka dengan tanda pemisah ribuan dan simbol mata uang
+    String formattedPrice = 'Rp ' +
+        parsedPrice.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+              (Match m) => '${m[1]}.',
+        );
+
+    return formattedPrice;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,15 +151,6 @@ class _DetailProdukState extends State<DetailProduk> {
                         );
                       },
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.share,
-                        color: _isScrolled ? Colors.black : Colors.white,
-                      ),
-                      onPressed: () {
-                        // Aksi saat ikon Share ditekan
-                      },
-                    ),
                   ],
                   floating: true,
                   pinned: true,
@@ -175,7 +189,7 @@ class _DetailProdukState extends State<DetailProduk> {
                                 height: 15,
                               ),
                               Text(
-                                '\Rp.${widget.product['price']}',
+                                '${formatPrice(widget.product['price'])}',
                                 style: TextStyle(
                                     color: Colors.red,
                                     fontSize: 16),
@@ -232,17 +246,17 @@ class _DetailProdukState extends State<DetailProduk> {
                                         Row(
                                           children: [
                                             Text(
-                                              "Min. Pemesanan",
+                                              "Stock Product",
                                               style: TextStyle(
                                                   color: Color(0xFF585858),
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w400),
                                             ),
                                             SizedBox(
-                                              width: 30,
+                                              width: 50,
                                             ),
                                             Text(
-                                              "1 Buah",
+                                              widget.product['stock'],
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 16,
@@ -330,7 +344,7 @@ class _DetailProdukState extends State<DetailProduk> {
                           thickness: 3,
                         ),
                         Container(
-                          child: Katalogs(),
+                          child: Katalog(),
                           height: 300,
                         ),
                         Divider(
@@ -531,35 +545,42 @@ class _DetailProdukState extends State<DetailProduk> {
                                 color: Color(0xFF94AF9F),
                               ),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
+                            GestureDetector(
+                              onTap: () {
                                 _addToCart();
                               },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add,
+                              child: Container(
+                                width: 135,
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
                                     color: Color(0xFF94AF9F),
+                                    width: 1.0,
                                   ),
-                                  SizedBox(width: 2),
-                                  Text(
-                                    "Keranjang",
-                                    style: TextStyle(
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add,
                                       color: Color(0xFF94AF9F),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.white,
-                                elevation: 0,
+                                    SizedBox(width: 2),
+                                    Text(
+                                      "Keranjang",
+                                      style: TextStyle(
+                                        color: Color(0xFF94AF9F),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             Container(
-                              width: 145,
+                              width: 135,
                               height: 46,
                               decoration: BoxDecoration(
                                 color: Color(0xFF94AF9F),
@@ -569,8 +590,8 @@ class _DetailProdukState extends State<DetailProduk> {
                                 child: Text(
                                   "Beli Sekarang",
                                   style: TextStyle(
-                                    color: Color(0xFFF6F7FA),
-                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),

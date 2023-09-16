@@ -54,7 +54,8 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                             ],
                           ),
-                          Search_box(),
+                          SizedBox(height: 30,),
+                          // Search_box(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -177,7 +178,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                           SizedBox(
-                            height: 90,
+                            height: 100,
                           )
                         ],
                       ),

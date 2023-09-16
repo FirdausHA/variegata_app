@@ -12,7 +12,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 192,
+      height: 200,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         scrollDirection: Axis.horizontal,
@@ -20,7 +20,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
         itemBuilder: (BuildContext context, int index) {
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 10),
-            width: 194,
+            width: 200,
             height: 140,
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -28,7 +28,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  width: 194,
+                  width: 200,
                   height: 140,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),

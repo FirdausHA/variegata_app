@@ -2,12 +2,11 @@ import "package:flutter/material.dart";
 import "package:variegata_app/common/widget/bottom_navbar.dart";
 import "package:variegata_app/common/widget/iklan_carousel.dart";
 import "package:variegata_app/common/widget/search_box.dart";
-import "package:variegata_app/pages/catalog_shop/Example%20cart.dart";
-import "package:variegata_app/pages/catalog_shop/Toko_Alat.dart";
-import "package:variegata_app/pages/catalog_shop/Toko_Benih.dart";
-import "package:variegata_app/pages/catalog_shop/Toko_Pestisida.dart";
-import "package:variegata_app/pages/catalog_shop/Toko_Pupuk.dart";
-import "package:variegata_app/pages/catalog_shop/Toko_Tanaman.dart";
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Toko_Alat.dart';
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Toko_Benih.dart';
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Toko_Pestisida.dart';
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Toko_Pupuk.dart';
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Toko_Tanaman.dart';
 import "package:variegata_app/pages/catalog_shop/cart.dart";
 
 

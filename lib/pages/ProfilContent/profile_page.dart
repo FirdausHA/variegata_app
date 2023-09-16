@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:variegata_app/Services/auth_services.dart';
 import 'package:variegata_app/auth/login_page.dart';
 import 'package:variegata_app/pages/ProfilContent/Favorit.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
 import 'package:variegata_app/pages/ProfilContent/Status_Pemesanan.dart';
-import 'package:variegata_app/pages/catalog_shop/ganti_alamat.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat/ganti_alamat.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key? key}) : super(key: key);
@@ -14,6 +16,32 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
+  Future<void> logout(String accessToken) async {
+    final url = Uri.parse('https://variegata.my.id/api/logout');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Logout berhasil
+      await AuthServices.removeTokenFromLocalStorage();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (Route<dynamic> route) => false,
+      );
+    } else {
+      // Logout gagal, handle sesuai kebutuhan
+      print('Logout gagal');
+      // Anda dapat mencetak pesan kesalahan dari respons jika perlu
+      print(response.body);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,18 +88,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             Row(
                               children: [
                                 Container(
-                                  // padding: const EdgeInsets.only(
-                                  //   left: 10,
-                                  //   top: 13,
-                                  //   bottom: 13,
-                                  // ),
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: AssetImage(
-                                            'assets/img/profile-picture.png'),
-                                        fit: BoxFit.cover),
+                                      image: AssetImage(
+                                        'assets/img/profile-picture.png',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -79,12 +104,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   width: 10,
                                 ),
                                 Container(
-                                  // padding: const EdgeInsets.only(
-                                  //     left: 13, top: 10, bottom: 10),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'BhreKheley',
@@ -146,17 +168,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           "Pesanan & Aktivitas",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w600),
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Favorit()));
+                            context,
+                            MaterialPageRoute(builder: (context) => Favorit()),
+                          );
                         },
                         child: IconMenu(
                           'favorit.svg',
@@ -170,9 +193,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StatusPemesanan()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StatusPemesanan(),
+                            ),
+                          );
                         },
                         child: IconMenu(
                           'status-pemesanan.svg',
@@ -186,9 +211,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RiwayatPembelian()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RiwayatPembelian(),
+                            ),
+                          );
                         },
                         child: IconMenu(
                           'riwayat-pembelian.svg',
@@ -213,9 +240,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           "Pengaturan Akun",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w600),
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       IconMenu(
@@ -229,9 +257,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => GantiAlamat()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GantiAlamat(),
+                            ),
+                          );
                         },
                         child: IconMenu(
                           'alamat-pengiriman.svg',
@@ -257,9 +287,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           "Informasi Lainnya",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w600),
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       IconMenu(
@@ -275,12 +306,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         'Tentang Kami',
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()),
-                          );
+                        onTap: () async {
+                          final accessToken = await AuthServices.getTokenFromLocalStorage();
+                          if (accessToken != null) {
+                            await logout(accessToken);
+                            // Setelah berhasil logout, navigasi ke halaman login atau halaman lainnya
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => LoginPage()),
+                                  (Route<dynamic> route) => false,
+                            );
+                          }
                         },
                         child: Container(
                           margin: EdgeInsets.only(top: 20),
@@ -324,8 +359,6 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           Container(
-            // width: 343,
-            // height: 37,
             color: Colors.transparent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

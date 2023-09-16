@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:variegata_app/pages/catalog_shop/Detail_Toko.dart';
+import 'package:variegata_app/pages/catalog_shop/Toko_Product/Detail_Toko.dart';
 
 class Katalog extends StatefulWidget {
   const Katalog({Key? key}) : super(key: key);
