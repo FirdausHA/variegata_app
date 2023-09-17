@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
@@ -143,10 +142,11 @@ class _ShopPupukState extends State<ShopPupuk> {
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(5),
                             ),
-                            child: CachedNetworkImage(
-                              imageUrl: 'https://variegata.my.id/storage/${product['image']}',
-                              errorWidget: (context, url, error) => Icon(Icons.error),
-                              alignment: Alignment.topCenter,
+                            child: Image.network(
+                              'https://variegata.my.id/storage/${product['image']}',
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.error);
+                              },
                               fit: BoxFit.cover,
                               width: double.infinity,
                               height: 110,

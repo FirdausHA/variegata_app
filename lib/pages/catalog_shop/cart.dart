@@ -3,9 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:variegata_app/pages/catalog_shop/Checkout/checkout_product.dart';
 import 'dart:convert';
-
 import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class Cart extends StatefulWidget {
   const Cart({Key? key}) : super(key: key);
@@ -389,10 +387,10 @@ class _CartState extends State<Cart> {
                               Center(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl:
+                                  child: Image.network(
                                     'https://variegata.my.id/storage/${cartItem['product']['image']}',
-                                    errorWidget: (context, url, error) => Icon(Icons.error),
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Icon(Icons.error),
                                     width: 85,
                                     height: 85,
                                   ),

@@ -1,5 +1,4 @@
 import 'package:variegata_app/pages/informasi/detail_informasi.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -425,7 +424,7 @@ class _InformasiPageState extends State<InformasiPage> {
                           ),
                         ),
                         Text(
-                          'Apr 04, 2092',
+                            '${product['created_at']}',
                           style: TextStyle(
                             color: Color(0xFFBABABA),
                             fontSize: 10,
@@ -450,19 +449,14 @@ class _InformasiPageState extends State<InformasiPage> {
                         offset: Offset(0, 0),
                       ),
                     ],
+                    borderRadius: BorderRadius.circular(10), // Tambahkan BorderRadius di sini
                   ),
-                  child: CachedNetworkImage(
-                    imageUrl: 'https://variegata.my.id/storage/${product['image']}',
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                    imageBuilder: (context, imageProvider) => Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                  child: Image.network(
+                    'https://variegata.my.id/storage/${product['image']}',
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error);
+                    },
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],

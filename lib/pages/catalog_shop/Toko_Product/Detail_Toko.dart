@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 import 'package:http/http.dart' as http;
-import 'package:variegata_app/pages/catalog_shop/Example_Katalog.dart';
 import 'package:variegata_app/pages/catalog_shop/Katalog.dart';
 import 'package:variegata_app/pages/catalog_shop/cart.dart';
 
@@ -156,13 +154,14 @@ class _DetailProdukState extends State<DetailProduk> {
                   pinned: true,
                   expandedHeight: 270,
                   flexibleSpace: FlexibleSpaceBar(
-                    background: CachedNetworkImage(
-                      imageUrl: 'https://variegata.my.id/storage/${widget.product['image']}',
-                      placeholder: (context, url) => CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
-                      fit: BoxFit.cover,
+                    background: Image.network(
+                      'https://variegata.my.id/storage/${widget.product['image']}',
+                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                        return Icon(Icons.error); // Display an error icon if the image fails to load.
+                      },
+                      fit: BoxFit.cover, // You can adjust the fit to your preference.
                     ),
-                  ),
+                  )
                 ),
               ];
             },

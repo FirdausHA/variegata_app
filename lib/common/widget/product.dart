@@ -12,7 +12,7 @@ class _ProductState extends State<Product> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 302,
+      height: 328,
       decoration: BoxDecoration(
         color: Color(0xFFDBE4C6),
         image: DecorationImage(

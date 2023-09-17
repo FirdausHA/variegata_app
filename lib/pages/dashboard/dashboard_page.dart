@@ -8,6 +8,7 @@ import 'package:variegata_app/common/widget/product.dart';
 import 'package:variegata_app/common/widget/search_box.dart';
 import 'package:variegata_app/pages/budidaya/Budidaya.dart';
 import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
+import 'package:variegata_app/pages/informasi/Artikel.dart';
 import 'package:variegata_app/pages/informasi/informasi.dart';
 
 
@@ -178,7 +179,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
                           SizedBox(
-                            height: 100,
+                            height: 130,
                           )
                         ],
                       ),

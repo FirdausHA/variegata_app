@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_dash/flutter_dash.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -75,8 +75,7 @@ class _BudidayaPageState extends State<BudidayaPage> {
           future: fetchBanners(),
           builder: (context, bannerSnapshot) {
             if (bannerSnapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-              );
+              return Center();
             } else if (bannerSnapshot.hasError) {
               return Center(
                 child: Text('Error loading banner data from API'),
@@ -131,9 +130,9 @@ class _BudidayaPageState extends State<BudidayaPage> {
                                   ),
                                 ],
                               ),
-                              CachedNetworkImage(
-                                imageUrl: 'https://variegata.my.id/storage/${banner['image']}',
-                                errorWidget: (context, url, error) => Icon(Icons.error),
+                              Image.network(
+                                'https://variegata.my.id/storage/${banner['image']}',
+                                errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
                                 width: 80,
                                 height: 80,
                               ),
@@ -147,8 +146,7 @@ class _BudidayaPageState extends State<BudidayaPage> {
                           future: fetchStages(bannerId),
                           builder: (context, stageSnapshot) {
                             if (stageSnapshot.connectionState == ConnectionState.waiting) {
-                              return Center(
-                              );
+                              return Center();
                             } else if (stageSnapshot.hasError) {
                               return Center(
                                 child: Text('Error loading stage data from API'),
@@ -161,269 +159,238 @@ class _BudidayaPageState extends State<BudidayaPage> {
                                 children: stages.map<Widget>((stage) {
                                   final stageId = stage['id'];
                                   final stageName = stage['name'];
-                                  return RefreshIndicator(
-                                    onRefresh: () => _refreshContents(stageId),
-                                    child: FutureBuilder<List<dynamic>>(
-                                      future: fetchContents(stageId),
-                                      builder: (context, contentSnapshot) {
-                                        if (contentSnapshot.connectionState == ConnectionState.waiting) {
-                                          return Center(
-                                          );
-                                        } else if (contentSnapshot.hasError) {
-                                          return Center(
-                                            child: Text('Error loading content data from API'),
-                                          );
-                                        } else if (!contentSnapshot.hasData || contentSnapshot.data!.isEmpty) {
-                                          return SizedBox(); // Return an empty widget if no content data
-                                        } else {
-                                          final contents = contentSnapshot.data!;
-                                          return Column(
-                                            children: [
-                                              // UI for stage
-                                              Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Container(
-                                                            padding: EdgeInsets.only(bottom: 10),
-                                                            child: Text(
-                                                              stageName,
-                                                              style: TextStyle(
-                                                                color: Colors.black,
-                                                                fontSize: 18,
-                                                                fontFamily: 'Inter',
-                                                                fontWeight: FontWeight.w500,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
+                                  return Column(
+                                    children: [
+                                      // UI for stage
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(bottom: 10),
+                                                    child: Text(
+                                                      stageName,
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 18,
+                                                        fontFamily: 'Inter',
+                                                        fontWeight: FontWeight.w500,
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                              RefreshIndicator(
-                                                onRefresh: () => _refreshContents(stageId),
-                                                child: FutureBuilder<List<dynamic>>(
-                                                  future: fetchContents(stageId),
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                                      return Center(
-                                                      );
-                                                    } else if (snapshot.hasError) {
-                                                      return Center(
-                                                        child: Text('Error loading data from API'),
-                                                      );
-                                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                                      return Center(
-                                                        child: Text('No data available'),
-                                                      );
-                                                    } else {
-                                                      final contents = snapshot.data!;
-                                                      if (contents.length == 1) {
-                                                        return ListView.builder(
-                                                          shrinkWrap: true,
-                                                          physics: NeverScrollableScrollPhysics(),
-                                                          itemCount: contents.length,
-                                                          itemBuilder: (context, index) {
-                                                            final content = contents[index];
-                                                            return GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => ContentDetail(content: content),
-                                                                  ),
-                                                                );
-                                                              },
-                                                              child: Center(
-                                                                child: Container(
-                                                                  padding: EdgeInsets.all(16),
-                                                                  child: Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      Container(
-                                                                        child: Stack(
-                                                                          children: [
-                                                                            CachedNetworkImage(
-                                                                              imageUrl: 'https://variegata.my.id/storage/${content['image']}',
-                                                                              errorWidget: (context, url, error) => Icon(Icons.error),
-                                                                              width: MediaQuery.of(context).size.width,
-                                                                              height: 180,
-                                                                              fit: BoxFit.cover,
-                                                                              imageBuilder: (context, imageProvider) => Container(
-                                                                                decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(5),
-                                                                                  image: DecorationImage(
-                                                                                    image: imageProvider,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            Positioned(
-                                                                              bottom: 0,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                                                                                decoration: BoxDecoration(
-                                                                                  color: Color(0xFFE3CA8A),
-                                                                                  borderRadius: BorderRadius.only(
-                                                                                    bottomLeft: Radius.circular(5),
-                                                                                  ),
-                                                                                ),
-                                                                                child: Text(
-                                                                                  content['name'],
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                    fontSize: 14,
-                                                                                    fontFamily: 'Inter',
-                                                                                    fontWeight: FontWeight.w400,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      RefreshIndicator(
+                                        onRefresh: () => _refreshContents(stageId),
+                                        child: FutureBuilder<List<dynamic>>(
+                                          future: fetchContents(stageId),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return Center();
+                                            } else if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text('Error loading data from API'),
+                                              );
+                                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                              return Center(
+                                                child: Text('No data available'),
+                                              );
+                                            } else {
+                                              final contents = snapshot.data!;
+                                              if (contents.length == 1) {
+                                                return ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics: NeverScrollableScrollPhysics(),
+                                                  itemCount: contents.length,
+                                                  itemBuilder: (context, index) {
+                                                    final content = contents[index];
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => ContentDetail(content: content),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Center(
+                                                        child: Container(
+                                                          padding: EdgeInsets.all(16),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Container(
+                                                                child: Stack(
+                                                                  children: [
+                                                                    Image.network(
+                                                                      'https://variegata.my.id/storage/${content['image']}',
+                                                                      errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                                                                      width: MediaQuery.of(context).size.width,
+                                                                      height: 180,
+                                                                      fit: BoxFit.cover,
+                                                                    ),
+                                                                    Positioned(
+                                                                      bottom: 0,
+                                                                      child: Container(
+                                                                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                                                        decoration: BoxDecoration(
+                                                                          color: Color(0xFFE3CA8A),
+                                                                          borderRadius: BorderRadius.only(
+                                                                            bottomLeft: Radius.circular(5),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                      Container(
-                                                                        padding: EdgeInsets.symmetric(vertical: 13),
                                                                         child: Text(
-                                                                          content['title'],
+                                                                          content['name'],
                                                                           style: TextStyle(
                                                                             color: Colors.black,
-                                                                            fontSize: 15,
+                                                                            fontSize: 14,
                                                                             fontFamily: 'Inter',
-                                                                            fontWeight: FontWeight.w500,
+                                                                            fontWeight: FontWeight.w400,
                                                                           ),
                                                                         ),
                                                                       ),
-                                                                      Text(
-                                                                        'Klik lebih lanjut',
-                                                                        style: TextStyle(
-                                                                          color: Color(0xFFBBD6B8),
-                                                                          fontSize: 12,
-                                                                          fontFamily: 'Inter',
-                                                                          fontWeight: FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                padding: EdgeInsets.symmetric(vertical: 13),
+                                                                child: Text(
+                                                                  content['title'],
+                                                                  style: TextStyle(
+                                                                    color: Colors.black,
+                                                                    fontSize: 15,
+                                                                    fontFamily: 'Inter',
+                                                                    fontWeight: FontWeight.w500,
                                                                   ),
                                                                 ),
                                                               ),
-                                                            );
-                                                          },
-                                                        );
-                                                      } else {
-                                                        return GridView.builder(
-                                                          shrinkWrap: true,
-                                                          physics: NeverScrollableScrollPhysics(),
-                                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                            crossAxisCount: 2,
+                                                              Text(
+                                                                'Klik lebih lanjut',
+                                                                style: TextStyle(
+                                                                  color: Color(0xFFBBD6B8),
+                                                                  fontSize: 12,
+                                                                  fontFamily: 'Inter',
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                          itemCount: contents.length,
-                                                          itemBuilder: (context, index) {
-                                                            final content = contents[index];
-                                                            return GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => ContentDetail(content: content),
-                                                                  ),
-                                                                );
-                                                              },
-                                                              child: Center(
-                                                                child: Container(
-                                                                  width: 160,
-                                                                  child: Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      Container(
-                                                                        child: Stack(
-                                                                          children: [
-                                                                            CachedNetworkImage(
-                                                                              imageUrl: 'https://variegata.my.id/storage/${content['image']}',
-                                                                              errorWidget: (context, url, error) => Icon(Icons.error),
-                                                                              height: 100,
-                                                                              fit: BoxFit.cover,
-                                                                              imageBuilder: (context, imageProvider) => Container(
-                                                                                decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                  image: DecorationImage(
-                                                                                    image: imageProvider,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            Positioned(
-                                                                              bottom: 0,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                                                                decoration: BoxDecoration(
-                                                                                  color: Color(0xFFE3CA8A),
-                                                                                  borderRadius: BorderRadius.only(
-                                                                                    bottomLeft: Radius.circular(5),
-                                                                                  ),
-                                                                                ),
-                                                                                child: Text(
-                                                                                  content['name'],
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.black,
-                                                                                    fontSize: 12,
-                                                                                    fontFamily: 'Inter',
-                                                                                    fontWeight: FontWeight.w400,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                return GridView.builder(
+                                                  shrinkWrap: true,
+                                                  physics: NeverScrollableScrollPhysics(),
+                                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount: 2,
+                                                  ),
+                                                  itemCount: contents.length,
+                                                  itemBuilder: (context, index) {
+                                                    final content = contents[index];
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => ContentDetail(content: content),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Center(
+                                                        child: Container(
+                                                          width: 160,
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Container(
+                                                                child: Stack(
+                                                                  children: [
+                                                                    Image.network(
+                                                                      'https://variegata.my.id/storage/${content['image']}',
+                                                                      errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                                                                      height: 100,
+                                                                      fit: BoxFit.cover,
+                                                                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                                                        return Container(
+                                                                          decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(10),
+                                                                          ),
+                                                                          child: child,
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                    Positioned(
+                                                                      bottom: 0,
+                                                                      child: Container(
+                                                                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                                                        decoration: BoxDecoration(
+                                                                          color: Color(0xFFE3CA8A),
+                                                                          borderRadius: BorderRadius.only(
+                                                                            bottomLeft: Radius.circular(5),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                      Container(
-                                                                        padding: EdgeInsets.symmetric(vertical: 10),
                                                                         child: Text(
-                                                                          content['title'],
+                                                                          content['name'],
                                                                           style: TextStyle(
                                                                             color: Colors.black,
                                                                             fontSize: 12,
                                                                             fontFamily: 'Inter',
-                                                                            fontWeight: FontWeight.w500,
+                                                                            fontWeight: FontWeight.w400,
                                                                           ),
                                                                         ),
                                                                       ),
-                                                                      Text(
-                                                                        'Klik lebih lanjut',
-                                                                        style: TextStyle(
-                                                                          color: Color(0xFFBBD6B8),
-                                                                          fontSize: 12,
-                                                                          fontFamily: 'Inter',
-                                                                          fontWeight: FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                    ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                padding: EdgeInsets.symmetric(vertical: 10),
+                                                                child: Text(
+                                                                  content['title'],
+                                                                  style: TextStyle(
+                                                                    color: Colors.black,
+                                                                    fontSize: 12,
+                                                                    fontFamily: 'Inter',
+                                                                    fontWeight: FontWeight.w500,
                                                                   ),
                                                                 ),
                                                               ),
-                                                            );
-                                                          },
-                                                        );
-                                                      }
-                                                    }
+                                                              Text(
+                                                                'Klik lebih lanjut',
+                                                                style: TextStyle(
+                                                                  color: Color(0xFFBBD6B8),
+                                                                  fontSize: 12,
+                                                                  fontFamily: 'Inter',
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
                                                   },
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }
-                                      },
-                                    ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 }).toList(),
                               );

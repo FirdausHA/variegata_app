@@ -13,7 +13,7 @@ class WelcomePage extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 10),
                 width: MediaQuery.of(context).size.width,
-                height: 450,
+                height: 435,
                 decoration: const BoxDecoration(),
                 child: Image(
                   image: AssetImage('assets/img/onboarding/Welcome.png'),
@@ -55,45 +55,6 @@ class WelcomePage extends StatelessWidget {
           ),
         ),
       ),
-      // backgroundColor: Colors.white,
-      // body: SafeArea(
-      //   child: Column(
-      //     children: [
-      //       // ignore: sized_box_for_whitespace
-      //       Container(
-      //           padding: EdgeInsets.zero,
-      //           width: 400,
-      //           height: 440,
-      //           child: Stack(
-      //             clipBehavior: Clip.none,
-      //             children: [
-      //               Container(),
-      //               Positioned(
-      //                 child: Image.asset(
-      //                   'assets/img/onboarding/seeding.png',
-      //                   height: 422,
-      //                 ),
-      //               ),
-      //             ],
-      //           )),
-      //       Padding(
-      //         padding: const EdgeInsets.only(right: 20),
-      //         child: Text(
-      //           "Selamat Datang di Variegata",
-      //             style: GoogleFonts.notoSerif(fontSize: 26, fontWeight: FontWeight.w600,
-      //             ),
-      //         ),
-      //       ),
-      //       Padding(
-      //         padding: const EdgeInsets.only(right: 100, top: 16),
-      //         child: Text(
-      //           "Variegata adalah aplikasi\npetani bahasa indonesia yang dapat\nmembantu anda dalam menanam\ntanaman yang anda inginkan!",
-      //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

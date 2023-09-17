@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class DetailInformasi extends StatefulWidget {
@@ -104,21 +103,11 @@ class _DetailInformasiState extends State<DetailInformasi> {
                       child: Container(
                         height: 350,
                         width: 350,
-                        child: CachedNetworkImage(
-                          imageUrl: 'https://variegata.my.id/storage/${widget.product['image']}',
-                          placeholder: (context, url) => CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                          imageBuilder: (context, imageProvider) => Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10), // Ganti 10 dengan radius yang diinginkan
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                        child: Image.network(
+                          'https://variegata.my.id/storage/${widget.product['image']}',
+                          fit: BoxFit.cover,
                         ),
-                      ),
+                      )
                     ),
                     SizedBox(
                       height: 15,

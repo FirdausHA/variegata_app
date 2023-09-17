@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:variegata_app/pages/budidaya/BudidayaPage.dart';
 
@@ -53,7 +52,7 @@ class _DetailPlantState extends State<DetailPlant>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FA),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
@@ -63,8 +62,8 @@ class _DetailPlantState extends State<DetailPlant>
           },
           color: Colors.black,
         ),
-        backgroundColor: const Color(0xFFF6F7FA),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 5,
       ),
       body: Column(
         children: [
@@ -74,9 +73,9 @@ class _DetailPlantState extends State<DetailPlant>
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  child: CachedNetworkImage(
-                    imageUrl: 'https://variegata.my.id/storage/${widget.product['image_bg']}',
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  child: Image.network(
+                    'https://variegata.my.id/storage/${widget.product['image_bg']}',
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -93,10 +92,10 @@ class _DetailPlantState extends State<DetailPlant>
                           borderRadius: BorderRadius.circular(50),
                           color: Colors.white,
                         ),
-                        child: CachedNetworkImage(
-                          imageUrl: 'https://variegata.my.id/storage/${widget.product['image']}',
-                          placeholder: (context, url) => CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
+                        child:  Image.network(
+                          'https://variegata.my.id/storage/${widget.product['image']}',
+                          errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                          fit: BoxFit.cover,
                         ),
                       ),
                       Container(
