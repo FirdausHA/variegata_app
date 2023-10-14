@@ -27,6 +27,9 @@ class _GantiAlamatState extends State<GantiAlamat> {
           icon: Icon(Icons.arrow_back),
           color: Color(0xFF33363F),
           onPressed: () {
+            Navigator.pop(
+              context,
+            );
           },
         ),
       ),

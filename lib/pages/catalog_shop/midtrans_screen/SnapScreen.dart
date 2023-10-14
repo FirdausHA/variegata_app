@@ -4,7 +4,6 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
-import 'package:variegata_app/pages/catalog_shop/Riwayat_Pembayaran/Riwayat.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'Config.dart';
@@ -91,7 +90,8 @@ class _Snap_screenState extends State<Snap_screen> {
                   print(error);
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => PaymentHistoryPage()),
+                      MaterialPageRoute(builder: (context) => BotNavbar()
+                      ),
                           (route) => false);
                 },
               )

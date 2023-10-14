@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat/Mini_map.dart';
+import 'package:variegata_app/pages/catalog_shop/Checkout/Checkout_kosong.dart';
+import 'package:variegata_app/pages/catalog_shop/Checkout/checkout.dart';
 import 'package:variegata_app/pages/catalog_shop/Checkout/checkout_product.dart';
 import 'dart:convert';
 import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
@@ -198,38 +202,74 @@ class _CartState extends State<Cart> {
         .format(totalHarga);
   }
 
-  void checkoutAndNavigate() {
-    selectedProducts.clear();
-    for (var cartItem in cartItems) {
-      if (cartItem['isChecked']) {
-        final productId = cartItem['product']['id'];
-        final quantity = productQuantities[productId] ?? 1;
-        final name = cartItem['product']['name'];
-        final image = cartItem['product']['image'];
-        final price = double.parse(cartItem['product']['price']);
+  Future<String?> getAccessToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token'); // Ganti 'access_token' dengan 'auth_token'
+  }
 
-        selectedProducts.add({
-          'name': name,
-          'quantity': quantity,
-          'image': image,
-          'price': price.toStringAsFixed(2), // Mengonversi harga menjadi String dengan 2 desimal
-        });
+  Future<void> _checkoutAndNavigate() async {
+    final token = await getAccessToken();
+    print('Access Token: $token');
+
+    if (token != null) {
+      final response = await http.get(
+        Uri.parse('https://variegata.my.id/api/addresses'), // Endpoint sesuai dengan metode index di kontroler Laravel
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        if (responseData['addresses'].isNotEmpty) {
+          // Pengguna memiliki alamat
+          // Lanjutkan dengan checkout
+          selectedProducts.clear();
+          for (var cartItem in cartItems) {
+            if (cartItem['isChecked']) {
+              final productId = cartItem['product']['id'];
+              final quantity = productQuantities[productId] ?? 1;
+              final name = cartItem['product']['name'];
+              final image = cartItem['product']['image'];
+              final price = double.parse(cartItem['product']['price']);
+
+              selectedProducts.add({
+                'name': name,
+                'quantity': quantity,
+                'image': image,
+                'price': price.toStringAsFixed(2),
+              });
+            }
+          }
+
+          if (selectedProducts.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Checkout_AK(selectedProducts: selectedProducts),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Harap pilih item untuk melanjutkan")),
+            );
+          }
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MiniMap(selectedProducts: selectedProducts),
+            ),
+          );
+        }
+      } else {
+        print("Error: ${response.statusCode}");
       }
-    }
-
-    if (selectedProducts.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CheckoutProduct(selectedProducts: selectedProducts),
-        ),
-      );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Harap pilih item untuk melanjutkan")),
-      );
     }
   }
+
 
 
 
@@ -248,7 +288,7 @@ class _CartState extends State<Cart> {
           icon: Icon(Icons.arrow_back),
           color: Color(0xFF33363F),
           onPressed: () {
-            Navigator.push(
+            Navigator.pop(
               context,
               MaterialPageRoute(
                 builder: (context) => KatalogShop(),
@@ -552,7 +592,7 @@ class _CartState extends State<Cart> {
               ),
               Center(
                 child: InkWell(
-                  onTap: checkoutAndNavigate,
+                  onTap: _checkoutAndNavigate,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: 40,

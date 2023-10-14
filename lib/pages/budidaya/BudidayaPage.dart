@@ -117,7 +117,7 @@ class _BudidayaPageState extends State<BudidayaPage> {
                                   ),
                                   SizedBox(height: 10),
                                   SizedBox(
-                                    width: 193,
+                                    width: 200,
                                     child: Text(
                                       banner['subtitle'],
                                       style: TextStyle(

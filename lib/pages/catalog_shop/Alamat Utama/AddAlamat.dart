@@ -1,46 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:variegata_app/pages/catalog_shop/Alamat/Alamat.dart';
-import 'package:variegata_app/pages/catalog_shop/Checkout/checkout_product.dart';
 import 'dart:convert';
-import 'package:variegata_app/pages/catalog_shop/Keranjang/cart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat%20Utama/Alamat%20Utama%20Profile.dart';
 
-class AlamatModel {
-  final String alamat;
-  final String namaPenerima;
-  final String nomorTelepon;
-  final String catatan;
-
-  AlamatModel({
-    required this.alamat,
-    required this.namaPenerima,
-    required this.nomorTelepon,
-    required this.catatan,
-  });
-}
-
-class TambahAlamat extends StatefulWidget {
-  final List<Map<String, dynamic>> selectedProducts;
-  TambahAlamat(
-      {Key? key,
-        required this.currentAddress,
-        required this.selectedProducts});
+class AddAlamat extends StatefulWidget {
+  AddAlamat({Key? key, required this.currentAddress});
   final String currentAddress;
 
   @override
-  State<TambahAlamat> createState() => _TambahAlamatState();
+  State<AddAlamat> createState() => _AddAlamatState();
 }
 
-class _TambahAlamatState extends State<TambahAlamat> {
+class _AddAlamatState extends State<AddAlamat> {
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController namaPenerimaController = TextEditingController();
   final TextEditingController nomorTeleponController = TextEditingController();
   final TextEditingController catatanController = TextEditingController();
 
-  Future<String?> _getAuthToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+  Future<String?> getAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? authToken = prefs.getString('auth_token');
+    return authToken;
   }
 
   void _simpanData() async {
@@ -49,16 +30,13 @@ class _TambahAlamatState extends State<TambahAlamat> {
     final String nomorTelepon = nomorTeleponController.text;
     final String catatan = catatanController.text;
 
-    // Mengambil auth_token dari SharedPreferences
-    final String? authToken = await _getAuthToken();
-
-    if (alamat.isEmpty || namaPenerima.isEmpty || nomorTelepon.isEmpty || authToken == null) {
+    if (alamat.isEmpty || namaPenerima.isEmpty || nomorTelepon.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Peringatan'),
-            content: Text('Mohon lengkapi semua data yang diperlukan atau token tidak tersedia.'),
+            content: Text('Mohon lengkapi semua data yang diperlukan.'),
             actions: <Widget>[
               TextButton(
                 child: Text('Tutup'),
@@ -101,23 +79,24 @@ class _TambahAlamatState extends State<TambahAlamat> {
       'catatan_driver': catatan,
     };
 
+    // Mengambil token autentikasi
+    String? authToken = await getAuthToken();
+
+    if (authToken == null) {
+      // Token tidak tersedia, tampilkan pesan kesalahan atau arahkan pengguna untuk masuk
+      return;
+    }
+
     final response = await http.post(
       Uri.parse('https://variegata.my.id/api/addresses'), // Ganti dengan URL endpoint Anda
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $authToken', // Menambahkan Bearer token ke header
+        'Authorization': 'Bearer $authToken', // Menambahkan token autentikasi ke header
       },
       body: jsonEncode(requestData),
     );
 
     if (response.statusCode == 200) {
-      final AlamatModel alamatModel = AlamatModel(
-        alamat: alamat,
-        namaPenerima: namaPenerima,
-        nomorTelepon: nomorTelepon,
-        catatan: catatan,
-      );
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -131,10 +110,7 @@ class _TambahAlamatState extends State<TambahAlamat> {
                   Navigator.of(context).pop(); // Tutup dialog sukses
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => CheckoutProduct(
-                        alamatModel: alamatModel,
-                        selectedProducts: widget.selectedProducts,
-                      ),
+                      builder: (context) => AddressAll(),
                     ),
                   );
                 },

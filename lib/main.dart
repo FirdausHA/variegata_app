@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:variegata_app/common/widget/bottom_navbar.dart';
-import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
 import 'package:variegata_app/pages/screens/SplashScreen.dart';
 
 void main() {
