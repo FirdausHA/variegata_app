@@ -61,9 +61,9 @@ class _RegisterPageState extends State<RegisterPage> {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('token', token);
 
-          final Map<String, dynamic> userData = responseMap['user']; // Ambil data user dari respons JSON
-          final String name = userData['name']; // Ambil "name" dari data user
-          final String email = userData['email']; // Ambil "email" dari data user
+          final Map<String, dynamic> userData = responseMap['user'];
+          final String name = userData['name'];
+          final String email = userData['email'];
 
           // Simpan "name" dan "email" ke penyimpanan lokal
           prefs.setString('name', name);

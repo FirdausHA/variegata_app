@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
-import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
 import 'dart:convert';
 import 'Detail_Toko.dart';
 

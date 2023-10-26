@@ -1,14 +1,13 @@
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:readmore/readmore.dart';
 import 'package:http/http.dart' as http;
-import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan_1.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan_2.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Data_Ulasan.dart';
 import 'package:variegata_app/pages/catalog_shop/Keranjang/Instan_Buy.dart';
 import 'package:variegata_app/pages/catalog_shop/Keranjang/cart.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 class DetailProduk extends StatefulWidget {
@@ -43,7 +42,14 @@ class _DetailProdukState extends State<DetailProduk> {
     super.dispose();
   }
 
+  Future<String?> _getAuthToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token');
+  }
+
   Future<void> _addToCart() async {
+    final String? authToken = await _getAuthToken();
+
     final productId = widget.product['id'];
     final quantity = 1;
 
@@ -52,11 +58,17 @@ class _DetailProdukState extends State<DetailProduk> {
     if (availableStock >= quantity) {
       final response = await http.post(
         Uri.parse('https://variegata.my.id/api/add-to-cart'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
         body: {
           'product_id': productId.toString(),
           'quantity': quantity.toString(),
         },
       );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -107,35 +119,6 @@ class _DetailProdukState extends State<DetailProduk> {
         'quantity': newStock.toString(),
       },
     );
-
-    if (response.statusCode != 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal memperbarui stok produk'),
-        ),
-      );
-    }
-  }
-
-  // Fungsi untuk mengambil data produk terbaru dari server
-  Future<void> _fetchProductData() async {
-    final productId = widget.product['id'];
-    final response = await http.get(
-      Uri.parse('https://variegata.my.id/api/products/$productId'),
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      setState(() {
-        widget.product['stock'] = responseData['stock'].toString();
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengambil data produk terbaru'),
-        ),
-      );
-    }
   }
 
   Future<void> _buyNow() async {
@@ -207,22 +190,15 @@ class _DetailProdukState extends State<DetailProduk> {
     return formattedPrice;
   }
 
-  void _openWhatsAppChat() async {
-    final phoneNumber = ''
-        '+6285702216485'; // Ganti dengan nomor telepon tujuan Anda
-    final message = 'Halo, saya tertarik dengan produk ini'; // Pesan awal (opsional)
-
-    final url = 'https://wa.me/$phoneNumber/?text=${Uri.encodeFull(message)}';
+  void redirectToWhatsAppBusiness() async {
+    final phoneNumber = '+6285702216485'; // Ganti dengan nomor WhatsApp Business yang ingin Anda tuju
+    final url = 'https://wa.me/$phoneNumber';
 
     if (await canLaunch(url)) {
+      print('Launching URL: $url');
       await launch(url);
     } else {
-      // Handle jika tidak dapat membuka WhatsApp
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal membuka WhatsApp'),
-        ),
-      );
+      print('Tidak dapat membuka URL: $url');
     }
   }
 
@@ -448,7 +424,7 @@ class _DetailProdukState extends State<DetailProduk> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 25,
+                                    height: 20,
                                   ),
                                 ],
                               ),
@@ -458,171 +434,123 @@ class _DetailProdukState extends State<DetailProduk> {
                       ),
                       Divider(
                         color: Color(0xFFD9D9D9),
-                        thickness: 3,
+                        thickness: 2,
                       ),
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 25, right: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Ulasan pembeli',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                            const Ulasan_produk()),
-                                      );
-                                    },
-                                    child: Text(
-                                      'Lihat Semua',
+                      Center(
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20, top: 10, right: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Ulasan Pembeli',
                                       style: TextStyle(
-                                          color: Color(0xFF94AF9F),
-                                          fontSize: 14),
+                                        color: Colors.black54,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 8, right: 20),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFC400),
-                                    size: 20,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFC400),
-                                    size: 20,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFC400),
-                                    size: 20,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFC400),
-                                    size: 20,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFD9D9D9),
-                                    size: 20,
-                                  ),
-                                  SizedBox(
-                                    width: 7,
-                                  ),
-                                  Text(
-                                    "4.9/5",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  SizedBox(
-                                    width: 7,
-                                  ),
-                                  Text(
-                                    "(1000 Ulasan)",
-                                    style: TextStyle(
-                                        color: Color(0xFF585858),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Divider(
-                              color: Color(0xFFD9D9D9),
-                              thickness: 1,
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 15, right: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Color(0xFF90AF9D),
-                                        ),
-                                        width: 38,
-                                        height: 38,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                          BorderRadius.circular(50),
-                                          color: Color(0xFFECF4EB),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 17,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Icikiwir Icikonde",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Ulasan( product: widget.product,),
                                           ),
-                                          Row(
-                                            children: List.generate(
-                                              5,
-                                                  (index) => Icon(
-                                                Icons.star,
-                                                color: Color(0xFFFFC400),
-                                                size: 15,
+                                        );
+                                      },
+                                      child: Text(
+                                        'Lihat Semua',
+                                        style: GoogleFonts.notoSerif(
+                                            color: Color(0xFF94AF9F),
+                                            fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Divider(
+                                color: Color(0xFFD9D9D9),
+                                thickness: 2,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    left: 20, top: 15, right: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Color(0xFF90AF9D),
+                                          ),
+                                          width: 38,
+                                          height: 38,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                            BorderRadius.circular(50),
+                                            color: Color(0xFFECF4EB),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 17,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Icikiwir Icikonde",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            Row(
+                                              children: List.generate(
+                                                5,
+                                                    (index) => Icon(
+                                                  Icons.star,
+                                                  color: Color(0xFFFFC400),
+                                                  size: 15,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  Text(
-                                    "Proses dan pengiriman cepat, kemasan baik rapih, kualitas produk baik, sesuai pesanan, gambar dan deskripsi :)",
-                                    style: TextStyle(
-                                        color: Color(0xFF585858),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    Text(
+                                      "Proses dan pengiriman cepat, kemasan baik rapih, kualitas produk baik, sesuai pesanan, gambar dan deskripsi :)",
+                                      style: TextStyle(
+                                          color: Color(0xFF585858),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 100,
-                            )
-                          ],
+                              SizedBox(
+                                height: 100,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -661,7 +589,7 @@ class _DetailProdukState extends State<DetailProduk> {
                           ),
                           child: GestureDetector(
                             onTap: () {
-                              _openWhatsAppChat();
+                              redirectToWhatsAppBusiness();
                             },
                             child: Icon(
                               Icons.chat,

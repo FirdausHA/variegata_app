@@ -7,7 +7,6 @@ import 'package:variegata_app/Services/globals.dart';
 import 'package:variegata_app/Services/rounded_button.dart';
 import 'package:variegata_app/auth/register_page.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
-import 'package:variegata_app/pages/ProfilContent/profile_page.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -30,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       try {
-        // Menampilkan dialog dengan CircularProgressIndicator dan pesan "Loading..."
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -57,17 +55,17 @@ class _LoginPageState extends State<LoginPage> {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('token', token);
 
-          final Map<String, dynamic> userData = responseMap['user']; // Ambil data user dari respons JSON
-          final String name = userData['name']; // Ambil name dari data user
-          final String email = userData['email']; // Ambil email dari data user
+          final Map<String, dynamic> userData = responseMap['user'];
+          final String name = userData['name'];
+          final String email = userData['email'];
 
           // Simpan name ke penyimpanan lokal
           prefs.setString('name', name);
           prefs.setString('email', email);
 
           setState(() {
-            _name = name; // Simpan name ke dalam _name
-            _email = email; // Simpan email ke dalam _email
+            _name = name;
+            _email = email;
             _isLoading = false;
           });
 

@@ -56,7 +56,14 @@ class _CartState extends State<Cart> {
   }
 
   Future<void> fetchCartItems() async {
-    final response = await http.get(Uri.parse('http://variegata.my.id/api/cart'));
+    final token = await getAccessToken();
+    print('Access Token: $token');
+
+    final response = await http.get(Uri.parse('https://variegata.my.id/api/cart'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       setState(() {
         cartItems = json.decode(response.body);
@@ -71,10 +78,14 @@ class _CartState extends State<Cart> {
   }
 
   Future<void> deleteCartItem(int cartItemId, int index) async {
+    final token = await getAccessToken();
+    print('Access Token: $token');
+
     try {
       final response = await http.delete(
-        Uri.parse('http://variegata.my.id/api/remove-from-cart/$cartItemId'),
+        Uri.parse('https://variegata.my.id/api/delete-cart/$cartItemId'),
         headers: <String, String>{
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
@@ -137,8 +148,15 @@ class _CartState extends State<Cart> {
   }
 
   Future<void> updateCartItem(int cartItemId, int quantity) async {
+    final token = await getAccessToken();
+    print('Access Token: $token');
+
     try {
-      final response = await http.get(Uri.parse('http://variegata.my.id/api/update-cart-item/$cartItemId?quantity=$quantity'));
+      final response = await http.get(Uri.parse('https://variegata.my.id/api/update-cart-item/$cartItemId?quantity=$quantity'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
       if (response.statusCode == 200) {
         setState(() {
           cartItems = json.decode(response.body);
@@ -290,9 +308,6 @@ class _CartState extends State<Cart> {
           onPressed: () {
             Navigator.pop(
               context,
-              MaterialPageRoute(
-                builder: (context) => KatalogShop(),
-              ),
             );
           },
         ),
@@ -458,7 +473,7 @@ class _CartState extends State<Cart> {
                                           ),
                                           GestureDetector(
                                             onTap: () {
-                                              _showDeleteConfirmationDialog(cartItem['id'], index);
+                                              _showDeleteConfirmationDialog(cartItemId, index);
                                             },
                                             child: Icon(
                                               Icons.delete,

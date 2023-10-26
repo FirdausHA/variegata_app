@@ -114,7 +114,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
                                     child: Align(
                                       alignment: Alignment.bottomLeft,
                                       child: Container(
-                                        width: 160,
+                                        width: 130,
                                         height: 130,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(
@@ -150,7 +150,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
                           left: 8,
                           top: 37,
                           child: SizedBox(
-                            width: 140,
+                            width: 115,
                             child: Text(
                               product['name'],
                               style: TextStyle(
@@ -182,7 +182,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
                         ),
                         const Positioned(
                           left: 30,
-                          top: 95,
+                          top: 105,
                           child: Text(
                             "Variegata",
                             textAlign: TextAlign.center,
@@ -196,7 +196,7 @@ class _Artikel_carouselState extends State<Artikel_carousel> {
                         ),
                         Positioned(
                           left: 8,
-                          top: 95,
+                          top: 105,
                           child: Container(
                             width: 18,
                             height: 18,

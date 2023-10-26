@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Review/Review_product_1.dart';
+import 'package:variegata_app/pages/Ulasan_Pembeli/Review/Review.dart';
 
 class DetailPemesanan extends StatefulWidget {
   const DetailPemesanan({super.key});
@@ -125,7 +125,7 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                               fontWeight: FontWeight.w400),
                         ),
                         Text(
-                          "Rp60.000",
+                          "Rp45.000",
                           style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 17,
@@ -260,7 +260,7 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                                       height: 3,
                                     ),
                                     Text(
-                                      "Rp60.000",
+                                      "Rp45.000",
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
@@ -438,144 +438,32 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                       "Rincian Pembayaran",
                       style: TextStyle(
                         color: Color(0xFF505050),
-                        fontSize: 17,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(
                       height: 15,
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     Text(
-                    //       "Kurir",
-                    //       style: TextStyle(
-                    //           color: Color(0xFFADADAD),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //     Text(
-                    //       "COD",
-                    //       style: TextStyle(
-                    //           color: Color(0xFF505050),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 5,
-                    // ),
-                    // Divider(
-                    //   thickness: 1,
-                    //   color: Color(0xFFD9D9D9),
-                    // ),
-                    // SizedBox(
-                    //   height: 5,
-                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "Total Harga",
                           style: TextStyle(
-                              color: Color(0xFFADADAD),
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400),
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          "Rp60.000",
+                          "Rp45.000",
                           style: TextStyle(
-                              color: Color(0xFF505050),
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400),
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     Text(
-                    //       "Total Ongkos Kirim (Reguler)",
-                    //       style: TextStyle(
-                    //           color: Color(0xFFADADAD),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //     Text(
-                    //       "Rp13.000",
-                    //       style: TextStyle(
-                    //           color: Color(0xFF505050),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 5,
-                    // ),
-                    // Divider(
-                    //   thickness: 1,
-                    //   color: Color(0xFFD9D9D9),
-                    // ),
-                    // SizedBox(
-                    //   height: 5,
-                    // ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Total Belanja",
-                          style: TextStyle(
-                            color: Color(0xFF505050),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          "Rp60.000",
-                          style: TextStyle(
-                            color: Color(0xFF505050),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const NilaiProduk()),
-                        );
-                      },
-                      child: Container(
-                        width: 355,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF9ED098),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "Nilai",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 21,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               )

@@ -1,42 +1,112 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
 import 'package:flutter/services.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan.dart'; //untuk membatasi kata pada textfield
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NilaiProduk extends StatefulWidget {
-  const NilaiProduk({super.key});
+import '../Ulasan/Data_Ulasan.dart';
+
+class Rating extends StatefulWidget {
+  final dynamic product;
+  const Rating({Key? key, required this.product}) : super(key: key);
 
   @override
-  State<NilaiProduk> createState() => _NilaiProdukState();
+  _RatingState createState() => _RatingState();
 }
 
+class _RatingState extends State<Rating> {
+  double selectedRating = 0;
+  TextEditingController commentController = TextEditingController();
 
-class _NilaiProdukState extends State<NilaiProduk> {
+  bool isSubmitting = false;
 
-  Future<void> postReview(String reviewText, double rating) async {
-    final url = Uri.parse('https://variegata.my.id/api/reviews'); // Replace with your API endpoint
+  Future<String?> _getAuthToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token');
+  }
+
+  Future<void> submitReview(double rating, String comment) async {
+    setState(() {
+      isSubmitting = true;
+    });
+
+    final String? authToken = await _getAuthToken();
+
+    String apiUrl = 'https://variegata.my.id/api/reviews'; // Ganti dengan URL endpoint Anda
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $authToken', // Ganti dengan token autentikasi jika diperlukan
+    };
+    Map<String, dynamic> data = {
+      'rating': rating,
+      'comment': comment,
+      'product_id': widget.product['id'], // Sesuaikan dengan bagaimana Anda mengambil product_id
+    };
     final response = await http.post(
-      url,
-      body: {
-        'reviewText': reviewText,
-        'rating': rating.toString(),
-      },
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: jsonEncode(data),
     );
-
     if (response.statusCode == 200) {
-      // Review posted successfully, you can handle the response as needed.
-      print('Review posted successfully');
+      // Jika request berhasil, Anda dapat menangani respons di sini
+      print('Review submitted successfully');
+      // Tampilkan dialog sukses
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Penilaian Berhasil Terbuat'),
+            content: Text('Terima kasih telah memberi penilaian kepada produk kami.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup dialog sukses
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Ulasan(product: widget.product,)),
+                  );
+                },
+                child: Text('Lanjut'),
+              ),
+            ],
+          );
+        },
+      );
     } else {
-      // Handle the error if the POST request fails.
-      print('Failed to post review: ${response.statusCode}');
+      // Jika request gagal, Anda dapat menangani kesalahan di sini
+      print('Failed to submit review. Error: ${response.statusCode}');
+      // Beri tahu pengguna bahwa terjadi kesalahan
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Gagal Mengirim Penilaian'),
+            content: Text('Terjadi kesalahan saat mengirim penilaian. Silakan coba lagi nanti.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup dialog kesalahan
+                },
+                child: Text('Tutup'),
+              ),
+            ],
+          );
+        },
+      );
     }
+
+    setState(() {
+      isSubmitting = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    String productName = widget.product['name'];
+    String productImage = widget.product['image'];
+
     return Scaffold(
       backgroundColor: Color(0xFFF6F7FA),
       appBar: AppBar(
@@ -52,9 +122,6 @@ class _NilaiProdukState extends State<NilaiProduk> {
           onPressed: () {
             Navigator.pop(
               context,
-              MaterialPageRoute(
-                builder: (context) => RiwayatPembelian(),
-              ),
             );
           },
         ),
@@ -71,7 +138,9 @@ class _NilaiProdukState extends State<NilaiProduk> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: Image(
-                    image: AssetImage("assets/img/produk-philodendron.png"),
+                    image: NetworkImage(
+                      'https://variegata.my.id/storage/$productImage',
+                    ),
                     width: 39,
                     height: 39,
                   ),
@@ -82,7 +151,7 @@ class _NilaiProdukState extends State<NilaiProduk> {
                 Container(
                   width: 290,
                   child: Text(
-                    'Tanaman Philodendron Monstera Deliciosa',
+                    productName,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -119,14 +188,14 @@ class _NilaiProdukState extends State<NilaiProduk> {
                         color: Colors.black,
                         fontSize: 18,
                         fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(
                       width: 20,
                     ),
                     RatingBar.builder(
-                      initialRating: 2,
+                      initialRating: selectedRating,
                       minRating: 1,
                       direction: Axis.horizontal,
                       itemCount: 5,
@@ -137,7 +206,9 @@ class _NilaiProdukState extends State<NilaiProduk> {
                         color: Colors.amber,
                       ),
                       onRatingUpdate: (rating) {
-                        print(rating);
+                        setState(() {
+                          selectedRating = rating;
+                        });
                       },
                     )
                   ],
@@ -149,7 +220,7 @@ class _NilaiProdukState extends State<NilaiProduk> {
                   "Bagikan Pendapat Anda",
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
                   ),
@@ -159,11 +230,11 @@ class _NilaiProdukState extends State<NilaiProduk> {
                 ),
                 Container(
                   child: TextField(
+                    controller: commentController,
                     maxLines: 3,
                     maxLength: 60,
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(
-                          60), // Ganti dengan jumlah kata yang diinginkan
+                      LengthLimitingTextInputFormatter(60),
                     ],
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
@@ -172,8 +243,6 @@ class _NilaiProdukState extends State<NilaiProduk> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
-                      hintText:
-                      'Contoh: Tanaman nya bagus serta pelayanan yang ramah, terima kasih ^_^',
                     ),
                   ),
                 ),
@@ -187,28 +256,41 @@ class _NilaiProdukState extends State<NilaiProduk> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const UlasanPembeli()),
+            submitReview(selectedRating, commentController.text);
+            // Tampilkan indikator kemajuan saat mengirim ulasan
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Penilaian sedang dikirim...'),
+                    ],
+                  ),
+                );
+              },
             );
           },
           child: Container(
             width: MediaQuery.of(context).size.width - 40,
-            height: 40,
+            height: 50,
             child: Center(
               child: Text(
-                "Kirim",
+                "KIRIM",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 21,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             decoration: BoxDecoration(
-              color: Color(0xFF9ED098),
-              borderRadius: BorderRadius.circular(6),
+              color: Color(0xffa3bfae),
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),

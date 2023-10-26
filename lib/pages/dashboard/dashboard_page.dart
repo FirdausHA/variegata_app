@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:variegata_app/common/widget/artikel.dart';
 import 'package:variegata_app/common/widget/cuaca.dart';
 import 'package:variegata_app/common/widget/iklan_carousel.dart';
 import 'package:variegata_app/common/widget/product.dart';
-import 'package:variegata_app/common/widget/search_box.dart';
 import 'package:variegata_app/pages/budidaya/Budidaya.dart';
-import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
+import 'package:variegata_app/pages/dashboard/Dashboard-Katalog.dart';
 import 'package:variegata_app/pages/informasi/Artikel.dart';
 import 'package:variegata_app/pages/informasi/informasi.dart';
 

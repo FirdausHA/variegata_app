@@ -284,9 +284,6 @@ class _KeranjangState extends State<Keranjang> {
           onPressed: () {
             Navigator.pop(
               context,
-              MaterialPageRoute(
-                builder: (context) => KatalogShop(),
-              ),
             );
           },
         ),

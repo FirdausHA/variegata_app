@@ -3,18 +3,24 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
 import 'package:flutter/services.dart';
 import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Ulasan/Ulasan_2.dart'; //untuk membatasi kata pada textfield
 
-class Review_produk extends StatefulWidget {
-  const Review_produk({super.key});
+
+class NilaiProduk extends StatefulWidget {
+  final dynamic product;
+  const NilaiProduk({super.key, required this.product});
 
   @override
-  State<Review_produk> createState() => _Review_produkState();
+  State<NilaiProduk> createState() => _NilaiProdukState();
 }
 
-class _Review_produkState extends State<Review_produk> {
+
+class _NilaiProdukState extends State<NilaiProduk> {
+
   @override
   Widget build(BuildContext context) {
+    String productName = widget.product['name'];
+    String productImage = widget.product['image'];
+
     return Scaffold(
       backgroundColor: Color(0xFFF6F7FA),
       appBar: AppBar(
@@ -30,9 +36,6 @@ class _Review_produkState extends State<Review_produk> {
           onPressed: () {
             Navigator.pop(
               context,
-              MaterialPageRoute(
-                builder: (context) => RiwayatPembelian(),
-              ),
             );
           },
         ),
@@ -49,7 +52,9 @@ class _Review_produkState extends State<Review_produk> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: Image(
-                    image: AssetImage("assets/img/produk_tomat.png"),
+                    image: NetworkImage(
+                      'https://variegata.my.id/storage/$productImage', // Menggunakan image dari jaringan
+                    ),
                     width: 39,
                     height: 39,
                   ),
@@ -60,7 +65,7 @@ class _Review_produkState extends State<Review_produk> {
                 Container(
                   width: 290,
                   child: Text(
-                    'Tanaman Tomat Madu asli langsung dari petani',
+                    productName,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -97,14 +102,14 @@ class _Review_produkState extends State<Review_produk> {
                         color: Colors.black,
                         fontSize: 18,
                         fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     SizedBox(
                       width: 20,
                     ),
                     RatingBar.builder(
-                      initialRating: 2,
+                      initialRating: 0,
                       minRating: 1,
                       direction: Axis.horizontal,
                       itemCount: 5,
@@ -127,7 +132,7 @@ class _Review_produkState extends State<Review_produk> {
                   "Bagikan Pendapat Anda",
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
                   ),
@@ -150,8 +155,6 @@ class _Review_produkState extends State<Review_produk> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
-                      hintText:
-                      'Contoh: Tanaman nya bagus serta pelayanan yang ramah, terima kasih ^_^',
                     ),
                   ),
                 ),
@@ -165,28 +168,28 @@ class _Review_produkState extends State<Review_produk> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: GestureDetector(
           onTap: () {
-            Navigator.push(
+            Navigator.pop(
               context,
-              MaterialPageRoute(
-                  builder: (context) => const Ulasan_produk()),
+              // MaterialPageRoute(
+              //     builder: (context) => const UlasanPembeli()),
             );
           },
           child: Container(
             width: MediaQuery.of(context).size.width - 40,
-            height: 40,
+            height: 50,
             child: Center(
               child: Text(
-                "Kirim",
+                "KIRIM",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 21,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             decoration: BoxDecoration(
-              color: Color(0xFF9ED098),
-              borderRadius: BorderRadius.circular(6),
+              color: Color(0xffa3bfae),
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
