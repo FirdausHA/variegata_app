@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:variegata_app/pages/catalog_shop/Alamat/Mini_map.dart';
 import 'dart:convert';
 
-import 'package:variegata_app/pages/catalog_shop/Checkout/checkout.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat%20Utama/MiniMap.dart';
 
-class AlamatAll extends StatefulWidget {
-  final List<Map<String, dynamic>> selectedProducts;
-  const AlamatAll({Key? key, required this.selectedProducts}) : super(key: key);
+class AddressAll extends StatefulWidget {
+  const AddressAll({Key? key}) : super(key: key);
 
   @override
-  State<AlamatAll> createState() => _AlamatAllState();
+  State<AddressAll> createState() => _AddressAllState();
 }
 
-class _AlamatAllState extends State<AlamatAll> {
+class _AddressAllState extends State<AddressAll> {
   Future<List<dynamic>>? addresses;
   int? selectedAddressIndex;
 
@@ -29,6 +27,14 @@ class _AlamatAllState extends State<AlamatAll> {
     return prefs.getString('auth_token');
   }
 
+  String formatPhoneNumber(String phoneNumber) {
+    if (phoneNumber.startsWith('08')) {
+      return '+62${phoneNumber.substring(1)}';
+    } else {
+      return phoneNumber;
+    }
+  }
+
   Future<List<dynamic>> fetchAddresses() async {
     final String? authToken = await _getAuthToken();
 
@@ -40,12 +46,18 @@ class _AlamatAllState extends State<AlamatAll> {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body)['addresses'];
+      final List<dynamic> addresses = json.decode(response.body)['addresses'];
+
+      // Format nomor telepon untuk setiap alamat
+      for (var address in addresses) {
+        address['nomor_telepon'] = formatPhoneNumber(address['nomor_telepon']);
+      }
+
+      return addresses;
     } else {
       throw Exception('Gagal mengambil data alamat');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +85,7 @@ class _AlamatAllState extends State<AlamatAll> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MiniMap(
-                    selectedProducts: widget.selectedProducts,
-                  ),
+                  builder: (context) => MapAlamat(),
                 ),
               );
             },
@@ -159,77 +169,88 @@ class _AlamatAllState extends State<AlamatAll> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             final address = snapshot.data![index];
-                            return Card(
-                              elevation: 2,
-                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Center(
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 0),
-                                            child: Container(
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    address['nama'],
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 17,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 3,
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      address['nomor_telepon'],
+                            final isSelected = selectedAddressIndex == index;
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedAddressIndex = isSelected ? null : index;
+                                });
+                              },
+                              child: Card(
+                                elevation: isSelected ? 3 : 2,
+                                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                color: isSelected ? Color(0xFF9ED098) : Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Center(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 0),
+                                              child: Container(
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      address['nama'],
                                                       style: TextStyle(
-                                                        color: Color(0xFF505050),
+                                                        color: isSelected ? Colors.white : Colors.black,
                                                         fontSize: 17,
-                                                        fontWeight: FontWeight.w400,
+                                                        fontWeight: FontWeight.w600,
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Container(
-                                            width: 240,
-                                            child: Text(
-                                              address['alamat'],
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  color: Color(0xFF505050),
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w400),
+                                            SizedBox(
+                                              height: 5,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Radio(
-                                        activeColor: Color(0xFF91C6A6),
-                                        value: index, // Menggunakan indeks sebagai nilai
-                                        groupValue: selectedAddressIndex,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedAddressIndex = value; // Mengatur indeks alamat yang dipilih
-                                          });
-                                        },
-                                      ),
-                                    ],
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                formatPhoneNumber(address['nomor_telepon']),
+                                                style: TextStyle(
+                                                  color: isSelected ? Colors.white : Colors.black,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 240,
+                                              child: Text(
+                                                address['alamat'],
+                                                maxLines: isSelected ? 3 : 1, // Mengatur maxLines sesuai kondisi radio button
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: isSelected ? Colors.white : Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Radio(
+                                          activeColor: Colors.white,
+                                          value: index,
+                                          groupValue: selectedAddressIndex,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedAddressIndex = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -248,20 +269,12 @@ class _AlamatAllState extends State<AlamatAll> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Center(
-                                child: ElevatedButton(
+                                child: TextButton(
                                   onPressed: () {
                                     if (selectedAddressIndex != null) {
-                                      final selectedAddress = snapshot.data![selectedAddressIndex!]; // Menggunakan indeks untuk memilih alamat
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => Checkout(
-                                            selectedProducts: widget.selectedProducts,
-                                            selectedAddress: selectedAddress,
-                                          ),
-                                        ),
-                                      );
+                                      final selectedAddress = snapshot.data![selectedAddressIndex!];
+                                      Navigator.of(context).pop();
                                     } else {
-                                      // Tampilkan pesan kesalahan jika pengguna belum memilih alamat.
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
@@ -281,11 +294,13 @@ class _AlamatAllState extends State<AlamatAll> {
                                       );
                                     }
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: const Color(0xFF9ED098), // Warna latar belakang
-                                    elevation: 0, // Hilangkan bayangan
-                                    minimumSize: Size(double.infinity, 50), // Panjang dan tinggi tombol
-                                    padding: EdgeInsets.zero, // Hilangkan padding dalam tombol
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: const Color(0xFF9ED098),
+                                    elevation: 2,
+                                    minimumSize: Size(double.infinity, 50),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
                                   ),
                                   child: Text(
                                     'Simpan',

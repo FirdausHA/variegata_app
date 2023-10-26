@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:variegata_app/Services/auth_services.dart';
 import 'package:variegata_app/auth/login_page.dart';
-import 'package:variegata_app/pages/ProfilContent/Favorit.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
-import 'package:variegata_app/pages/ProfilContent/Status_Pemesanan.dart';
-import 'package:variegata_app/pages/catalog_shop/Alamat/ganti_alamat.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat%20Utama/Alamat%20Utama%20Profile.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key? key}) : super(key: key);
@@ -16,29 +15,77 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String _name = '';
+  String _email = '';
 
-  Future<void> logout(String accessToken) async {
-    final url = Uri.parse('https://variegata.my.id/api/logout');
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Logout'),
+          content: Text('Apakah Anda yakin ingin keluar?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Logout'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await logout();
+              },
+            ),
+          ],
+        );
       },
     );
+  }
 
-    if (response.statusCode == 200) {
-      // Logout berhasil
-      await AuthServices.removeTokenFromLocalStorage();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginPage()),
-            (Route<dynamic> route) => false,
+  Future<void> logout() async {
+    final accessToken = await AuthServices.getTokenFromLocalStorage();
+
+    if (accessToken != null) {
+      final url = Uri.parse('https://variegata.my.id/api/logout');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
       );
-    } else {
-      // Logout gagal, handle sesuai kebutuhan
-      print('Logout gagal');
-      // Anda dapat mencetak pesan kesalahan dari respons jika perlu
-      print(response.body);
+
+      if (response.statusCode == 200) {
+        // Logout berhasil
+        await AuthServices.removeTokenFromLocalStorage();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => LoginPage()),
+              (Route<dynamic> route) => false,
+        );
+      } else {
+        // Logout gagal, handle sesuai kebutuhan
+        print('Logout gagal');
+        // Anda dapat mencetak pesan kesalahan dari respons jika perlu
+        print(response.body);
+      }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Panggil metode untuk mengambil data user saat halaman profil dimuat
+  }
+
+  // Metode untuk mengambil data user dari penyimpanan lokal
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _name = prefs.getString('name') ?? '';
+      _email = prefs.getString('email') ?? '';
+    });
   }
 
 
@@ -74,13 +121,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         width: MediaQuery.of(context).size.width,
-                        height: 58,
+                        height: 86,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Color(0xFFD9D9D9),
                             width: 1,
                           ),
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,8 +135,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             Row(
                               children: [
                                 Container(
-                                  width: 32,
-                                  height: 32,
+                                  width: 60,
+                                  height: 60,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
                                       image: AssetImage(
@@ -109,28 +156,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'BhreKheley',
+                                        _name,
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontFamily: 'Inter',
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       Text(
-                                        '+6283877176446',
+                                        _email,
                                         style: TextStyle(
-                                          color: Color(0xFFADADAD),
-                                          fontSize: 10,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Text(
-                                        'nabil132@gmail.com',
-                                        style: TextStyle(
-                                          color: Color(0xFFADADAD),
-                                          fontSize: 10,
+                                          color: Colors.black,
+                                          fontSize: 14,
                                           fontFamily: 'Inter',
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -173,40 +211,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Favorit()),
-                          );
-                        },
-                        child: IconMenu(
-                          'favorit.svg',
-                          'Favorit',
-                        ),
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: Color(0xFFD9D9D9),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => StatusPemesanan(),
-                            ),
-                          );
-                        },
-                        child: IconMenu(
-                          'status-pemesanan.svg',
-                          'Status Pemesanan',
-                        ),
-                      ),
-                      Divider(
-                        thickness: 1,
-                        color: Color(0xFFD9D9D9),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -259,7 +263,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => GantiAlamat(),
+                              builder: (context) => AddressAll(),
                             ),
                           );
                         },
@@ -307,15 +311,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          final accessToken = await AuthServices.getTokenFromLocalStorage();
-                          if (accessToken != null) {
-                            await logout(accessToken);
-                            // Setelah berhasil logout, navigasi ke halaman login atau halaman lainnya
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(builder: (context) => LoginPage()),
-                                  (Route<dynamic> route) => false,
-                            );
-                          }
+                          await _showLogoutConfirmationDialog();
+                          await logout();
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => LoginPage()),
+                                (Route<dynamic> route) => false,
+                          );
                         },
                         child: Container(
                           margin: EdgeInsets.only(top: 20),

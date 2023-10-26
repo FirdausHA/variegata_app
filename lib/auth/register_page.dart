@@ -1,11 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:variegata_app/Services/auth_services.dart';
 import 'package:variegata_app/Services/globals.dart';
 import 'package:variegata_app/Services/rounded_button.dart';
 import 'package:variegata_app/auth/login_page.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -27,8 +28,26 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = true;
       });
 
+      // Menampilkan dialog dengan CircularProgressIndicator dan pesan "Loading..."
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text("Loading..."),
+              ],
+            ),
+          );
+        },
+      );
+
       bool emailValid = RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          r"^[a-zA-Z0-9.a-zA-Z0.9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(_email);
 
       if (emailValid) {
@@ -38,6 +57,22 @@ class _RegisterPageState extends State<RegisterPage> {
         if (response.statusCode == 200) {
           final String token = responseMap['token'];
           await AuthServices.saveTokenToLocalStorage(token);
+
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString('token', token);
+
+          final Map<String, dynamic> userData = responseMap['user'];
+          final String name = userData['name'];
+          final String email = userData['email'];
+
+          // Simpan "name" dan "email" ke penyimpanan lokal
+          prefs.setString('name', name);
+          prefs.setString('email', email);
+
+          setState(() {
+            _isLoading = false;
+          });
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -48,15 +83,24 @@ class _RegisterPageState extends State<RegisterPage> {
           setState(() {
             _isLoading = false;
           });
-          errorSnackBar(context, responseMap.values.first[0]);
+
+          // Menampilkan pesan kesalahan
+          errorSnackBar(context, responseMap['message']); // Menggunakan 'message' dari respons API
         }
       } else {
         setState(() {
           _isLoading = false;
         });
+        // Tutup dialog
+        Navigator.of(context).pop();
         errorSnackBar(context, 'Email is not valid');
       }
     } else {
+      setState(() {
+        _isLoading = false;
+      });
+      // Tutup dialog
+      Navigator.of(context).pop();
       errorSnackBar(context, 'Please fill in all required fields');
     }
   }
@@ -141,7 +185,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: TextField(
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFBBD6B8)),
+                              borderSide:
+                              BorderSide(color: Color(0xFFBBD6B8)),
                               borderRadius: BorderRadius.circular(24),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -184,7 +229,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: TextField(
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFBBD6B8)),
+                              borderSide:
+                              BorderSide(color: Color(0xFFBBD6B8)),
                               borderRadius: BorderRadius.circular(24),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -228,7 +274,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFFBBD6B8)),
+                              borderSide:
+                              BorderSide(color: Color(0xFFBBD6B8)),
                               borderRadius: BorderRadius.circular(24),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -263,78 +310,76 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                         ),
                       ),
-                      _isLoading
-                          ? CircularProgressIndicator() // Tampilkan loading jika sedang memproses
-                          : RoundedButton(
+                      RoundedButton(
                         btnText: 'Create Account',
                         onBtnPressed: () => createAccountPressed(),
                       ),
-                      Container(
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Color(0xFF94AF9F),
-                                thickness: 2,
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 15),
-                              child: Text(
-                                "Or",
-                                style: TextStyle(
-                                  color: Color(0xFF505050),
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Color(0xFF94AF9F),
-                                thickness: 2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 18),
-                        width: MediaQuery.of(context).size.width,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Color(0xFFBBD6B8),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "assets/img/google-icon.png",
-                              height: 22,
-                              width: 22,
-                              fit: BoxFit.fill,
-                            ),
-                            Text(
-                              "Sign in with Google",
-                              style: TextStyle(
-                                color: Color(0xFF505050),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xFF94AF9F),
-                            )
-                          ],
-                        ),
-                      ),
+                      // Container(
+                      //   margin: EdgeInsets.symmetric(vertical: 20),
+                      //   child: Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: Divider(
+                      //           color: Color(0xFF94AF9F),
+                      //           thickness: 2,
+                      //         ),
+                      //       ),
+                      //       Padding(
+                      //         padding:
+                      //         const EdgeInsets.symmetric(horizontal: 15),
+                      //         child: Text(
+                      //           "Or",
+                      //           style: TextStyle(
+                      //             color: Color(0xFF505050),
+                      //             fontSize: 19,
+                      //             fontWeight: FontWeight.w600,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Expanded(
+                      //         child: Divider(
+                      //           color: Color(0xFF94AF9F),
+                      //           thickness: 2,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(horizontal: 18),
+                      //   width: MediaQuery.of(context).size.width,
+                      //   height: 50,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(24),
+                      //     border: Border.all(
+                      //       color: Color(0xFFBBD6B8),
+                      //     ),
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     crossAxisAlignment: CrossAxisAlignment.center,
+                      //     children: [
+                      //       Image.asset(
+                      //         "assets/img/google-icon.png",
+                      //         height: 22,
+                      //         width: 22,
+                      //         fit: BoxFit.fill,
+                      //       ),
+                      //       Text(
+                      //         "Sign in with Google",
+                      //         style: TextStyle(
+                      //           color: Color(0xFF505050),
+                      //           fontWeight: FontWeight.w600,
+                      //         ),
+                      //       ),
+                      //       Icon(
+                      //         Icons.arrow_forward_ios,
+                      //         color: Color(0xFF94AF9F),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 30),
                         child: Row(

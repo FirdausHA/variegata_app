@@ -12,7 +12,7 @@ class Katalog extends StatefulWidget {
 }
 
 class _KatalogState extends State<Katalog> {
-  final String url = 'https://variegata.my.id/api/products';
+  final String url = 'https://variegata.my.id/api/products/category/1';
 
   Future<List<dynamic>> getProducts() async {
     var response = await http.get(Uri.parse(url));

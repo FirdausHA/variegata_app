@@ -165,7 +165,7 @@ class _CheckoutState extends State<Checkout> {
               ),
               Container(
                 width: 355,
-                height: 118,
+                height: 120,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   color: Colors.white,
@@ -185,30 +185,32 @@ class _CheckoutState extends State<Checkout> {
                           Padding(
                             padding: const EdgeInsets.only(top: 25),
                             child: Container(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    widget.selectedAddress['nama'],
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Center(
-                                    child: Text(
-                                      widget.selectedAddress['nomor_telepon'],
+                              child: Center(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      widget.selectedAddress['nama'],
                                       style: TextStyle(
-                                        color: Color(0xFF505050),
+                                        color: Colors.black,
                                         fontSize: 17,
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 3,
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        widget.selectedAddress['nomor_telepon'],
+                                        style: TextStyle(
+                                          color: Color(0xFF505050),
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -219,7 +221,7 @@ class _CheckoutState extends State<Checkout> {
                             width: 240,
                             child: Text(
                               widget.selectedAddress['alamat'],
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   color: Color(0xFF505050),
@@ -422,7 +424,7 @@ class _CheckoutState extends State<Checkout> {
               ),
               Container(
                 width: 355,
-                height: 150,
+                height: 165,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(3),
@@ -509,7 +511,7 @@ class _CheckoutState extends State<Checkout> {
       bottomNavigationBar: Container(
         color: Colors.white,
         width: 395,
-        height: 86,
+        height: 100 ,
         child: Padding(
           padding: const EdgeInsets.only(
             left: 20,

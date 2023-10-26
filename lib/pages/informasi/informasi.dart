@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:variegata_app/pages/informasi/detail_informasi.dart';
 import 'package:variegata_app/common/widget/bottom_navbar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -424,7 +425,7 @@ class _InformasiPageState extends State<InformasiPage> {
                           ),
                         ),
                         Text(
-                            '${product['created_at']}',
+                          DateFormat('dd, MMMM yyyy').format(DateTime.parse(product['created_at'])),
                           style: TextStyle(
                             color: Color(0xFFBABABA),
                             fontSize: 10,
@@ -437,26 +438,17 @@ class _InformasiPageState extends State<InformasiPage> {
                   ],
                 ),
                 Container(
-                  padding: EdgeInsets.all(10.0),
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 0.3,
-                        blurRadius: 20,
-                        offset: Offset(0, 0),
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10), // Tambahkan BorderRadius di sini
-                  ),
-                  child: Image.network(
-                    'https://variegata.my.id/storage/${product['image']}',
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.error);
-                    },
-                    fit: BoxFit.cover,
+                  width: 95,
+                  height: 95,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      'https://variegata.my.id/storage/${product['image']}',
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error);
+                      },
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ],

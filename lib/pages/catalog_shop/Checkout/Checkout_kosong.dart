@@ -1,31 +1,25 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:variegata_app/pages/catalog_shop/Alamat/Tambah_Alamat.dart';
+import 'package:variegata_app/pages/catalog_shop/Alamat/Alamat.dart';
 import 'package:variegata_app/pages/catalog_shop/Checkout/Detail_pesanan_checkout.dart';
-import 'package:variegata_app/pages/catalog_shop/midtrans_screen/SnapScreen.dart';
 
-class CheckoutProduct extends StatefulWidget {
-  final AlamatModel alamatModel;
+class Checkout_AK extends StatefulWidget {
   final List<Map<String, dynamic>> selectedProducts;
-
-  CheckoutProduct({ required this.selectedProducts, required this.alamatModel });
+  Checkout_AK({required this.selectedProducts});
 
   @override
-  State<CheckoutProduct> createState() => _CheckoutProductState();
+  State<Checkout_AK> createState() => _Checkou_AKtState();
 }
 
-class _CheckoutProductState extends State<CheckoutProduct> {
-
+class _Checkou_AKtState extends State<Checkout_AK> {
   Map<String, dynamic> get firstSelectedProduct =>
       widget.selectedProducts.isNotEmpty ? widget.selectedProducts.first : {};
 
   double calculateTotalPrice() {
     double totalPrice = 0.0;
     for (var product in widget.selectedProducts) {
+      // Menggunakan fungsi double.tryParse untuk menghindari kesalahan jika 'price' bukan String yang valid
       double price = double.tryParse(product['price']?.toString() ?? '0.0') ?? 0.0;
       int quantity = product['quantity'] ?? 0;
       totalPrice += (price * quantity);
@@ -33,60 +27,16 @@ class _CheckoutProductState extends State<CheckoutProduct> {
     return totalPrice;
   }
 
+  bool isAddressSelected = false;
+
   String formatPrice(double price) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp.', decimalDigits: 0)
         .format(price);
   }
+
   String formatTotalHarga(double totalHarga) {
     return NumberFormat.currency(locale: 'id', symbol: 'Rp.', decimalDigits: 0)
         .format(totalHarga);
-  }
-
-  Future<String?> fetchSnapToken(String qty) async {
-    final url = Uri.parse('https://variegata.my.id/api/checkout');
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? authToken = prefs.getString('auth_token');
-
-      if (authToken == null) {
-        print('Token tidak ditemukan di penyimpanan lokal.');
-        return null;
-      }
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $authToken',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          "qty": qty,
-          "total_price": calculateTotalPrice().toStringAsFixed(2),
-          "addresses_id": 1,
-          "product_id": 1
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['snapToken'];
-      } else if (response.statusCode == 422) {
-        final responseData = json.decode(response.body);
-        final errorMessage = responseData['message'];
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal mengambil snapToken: $errorMessage'),
-          ),
-        );
-        return null;
-      } else {
-        print('Gagal mengambil snapToken: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Error: $e');
-      return null;
-    }
   }
 
   @override
@@ -135,78 +85,89 @@ class _CheckoutProductState extends State<CheckoutProduct> {
               SizedBox(
                 height: 10,
               ),
-              Container(
-                width: 355,
-                height: 118,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(3),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 15,
-                    right: 15,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AlamatAll(selectedProducts: widget.selectedProducts),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 355,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: Colors.white,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 25),
-                            child: Container(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    widget.alamatModel.namaPenerima,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 3,
-                                  ),
-                                  Center(
-                                    child: Text(
-                                      widget.alamatModel.nomorTelepon,
-                                      style: TextStyle(
-                                        color: Color(0xFF505050),
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w400,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 25),
+                              child: Container(
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "Nama",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
+                                      SizedBox(
+                                        width: 3,
+                                      ),
+                                      Center(
+                                        child: Text(
+                                          "+6285702216485",
+                                          style: TextStyle(
+                                            color: Color(0xFF505050),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            width: 240,
-                            child: Text(
-                              widget.alamatModel.alamat,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: Color(0xFF505050),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400),
+                            SizedBox(
+                              height: 10,
                             ),
-                          ),
-                        ],
-                      ),
-                      Image(
-                        image: AssetImage("assets/img/lokasi.png"),
-                        width: 58,
-                        height: 58,
-                      )
-                    ],
+                            Container(
+                              width: 240,
+                              child: Text(
+                                "Isi dengan Alamat lengkap rumah, kost atau kantor anda",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Color(0xFF505050),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Image(
+                          image: AssetImage("assets/img/lokasi.png"),
+                          width: 58,
+                          height: 58,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -232,7 +193,8 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Order(selectedProducts: widget.selectedProducts),
+                          builder: (context) =>
+                              Order(selectedProducts: widget.selectedProducts),
                         ),
                       );
                     },
@@ -344,7 +306,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                                     Container(
                                       width: 185,
                                       child: Text(
-                                        firstSelectedProduct['name'] ?? 'Nama Produk Tidak Tersedia',
+                                        firstSelectedProduct['name'],
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -368,7 +330,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                                       height: 5,
                                     ),
                                     Text(
-                                      formatPrice(double.parse(firstSelectedProduct['price'] ?? '0.0')), // Menggunakan fungsi formatPrice
+                                      formatPrice(double.parse(firstSelectedProduct['price'] ?? '0.0')),
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 15,
@@ -393,7 +355,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
               ),
               Container(
                 width: 355,
-                height: 150,
+                height: 165,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(3),
@@ -429,8 +391,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                             ),
                           ),
                           Text(
-                            formatTotalHarga(
-                                calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                            formatTotalHarga(calculateTotalPrice()),
                             style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 16,
@@ -461,8 +422,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                             ),
                           ),
                           Text(
-                            formatTotalHarga(
-                                calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                            formatTotalHarga(calculateTotalPrice()),
                             style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 17,
@@ -482,7 +442,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
       bottomNavigationBar: Container(
         color: Colors.white,
         width: 395,
-        height: 86,
+        height: 100 ,
         child: Padding(
           padding: const EdgeInsets.only(
             left: 20,
@@ -509,8 +469,7 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                       height: 5,
                     ),
                     Text(
-                      formatTotalHarga(
-                          calculateTotalPrice()), // Menggunakan fungsi formatTotalHarga
+                      formatTotalHarga(calculateTotalPrice()),
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 21,
@@ -520,20 +479,25 @@ class _CheckoutProductState extends State<CheckoutProduct> {
                   ],
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    final snapToken = await fetchSnapToken(widget.selectedProducts.length.toString());
-                    if (snapToken != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Snap_screen(snap_token: snapToken),
+                  onTap: () {
+                    // Check if an address is selected
+                    if (!isAddressSelected) {
+                      // Show a snackbar message if the address is empty
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Alamat anda kosong, Silahkan pilih Alamat terlebih dahulu",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          backgroundColor: Colors.red, // Customize the snackbar color
                         ),
                       );
                     } else {
-                      // Handle jika gagal mengambil snap_token
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Gagal mengambil snap_token'),
+                      // Navigate to the checkout page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Order(selectedProducts: widget.selectedProducts),
                         ),
                       );
                     }
