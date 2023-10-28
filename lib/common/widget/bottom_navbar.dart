@@ -52,14 +52,14 @@ class _BotNavbarState extends State<BotNavbar> {
         children: tabItems,
       ),
       bottomNavigationBar: MotionTabBar(
-        labels: const ["Home", "Search", "Profile"],
+        labels: const ["Home", "Toko", "Profile"],
         initialSelectedTab: "Home",
         tabIconColor: Colors.grey[400],
         tabSelectedColor: const Color(0xFF94AF9F),
         onTabItemSelected: _onTabItemSelected,
         icons: const [
           Icons.home,
-          Icons.search_rounded,
+          Icons.store_mall_directory_outlined,
           Icons.person,
         ],
         textStyle: const TextStyle(color: Colors.black),

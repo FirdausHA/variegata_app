@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
 
-class DetailPemesanan extends StatefulWidget {
-  const DetailPemesanan({super.key});
+class Detail_transaksi extends StatefulWidget {
+  final Map<String, dynamic> transaction;
+  const Detail_transaksi({super.key, required this.transaction,});
 
   @override
-  State<DetailPemesanan> createState() => _DetailPemesananState();
+  State<Detail_transaksi> createState() => _Detail_transaksiState();
 }
 
-class _DetailPemesananState extends State<DetailPemesanan> {
+class _Detail_transaksiState extends State<Detail_transaksi> {
+  String formatPrice(String price) {
+    double parsedPrice = double.tryParse(price) ?? 0.0;
+
+    String formattedPrice = 'Rp ' +
+        parsedPrice.toStringAsFixed(0).replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+              (Match m) => '${m[1]}.',
+        );
+
+    return formattedPrice;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,28 +83,6 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                     SizedBox(
                       height: 7,
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     Text(
-                    //       "ID Pemesanan",
-                    //       style: TextStyle(
-                    //           color: Color(0xFFADADAD),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //     Text(
-                    //       "NFJA8FBAIJSBF0",
-                    //       style: TextStyle(
-                    //           color: Color(0xFF505050),
-                    //           fontSize: 17,
-                    //           fontWeight: FontWeight.w400),
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 5,
-                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -102,7 +94,7 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                               fontWeight: FontWeight.w400),
                         ),
                         Text(
-                          "27, Oktober 2023",
+                            DateFormat('dd, MMMM yyyy').format(DateTime.parse(widget.transaction['created_at'])),
                           style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 17,
@@ -117,14 +109,14 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Total Tagihan",
+                          "Total Belanja",
                           style: TextStyle(
                               color: Color(0xFFADADAD),
                               fontSize: 17,
                               fontWeight: FontWeight.w400),
                         ),
                         Text(
-                          "Rp.36.000",
+                          formatPrice(widget.transaction['total_price']),
                           style: TextStyle(
                               color: Color(0xFF505050),
                               fontSize: 17,
@@ -163,7 +155,7 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                     ),
                     Container(
                       width: 355,
-                      height: 150,
+                      height: 80,
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(9),
@@ -215,11 +207,9 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                                           maxLines: 1,
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
+                                      SizedBox(height: 3,),
                                       Text(
-                                        '3 barang',
+                                        "${widget.transaction['qty']} Produk",
                                         style: TextStyle(
                                           color: Color(0xFFADADAD),
                                           fontSize: 13,
@@ -232,61 +222,6 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Divider(
-                              thickness: 1,
-                              color: Color(0xFFD9D9D9),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Total Belanja",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    SizedBox(
-                                      height: 3,
-                                    ),
-                                    Text(
-                                      "Rp.36.000",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  width: 102,
-                                  height: 31,
-                                  decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(3),
-                                      border:
-                                      Border.all(color: Color(0xFF9ED098))),
-                                  child: Center(
-                                    child: Text(
-                                      "Beli Lagi",
-                                      style: TextStyle(
-                                          color: Color(0xFF9ED098),
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )
                           ],
                         ),
                       ),
@@ -328,26 +263,6 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Text(
-                              //   "Kurir",
-                              //   style: TextStyle(
-                              //       color: Color(0xFFADADAD),
-                              //       fontSize: 17,
-                              //       fontWeight: FontWeight.w400),
-                              // ),
-                              // SizedBox(
-                              //   height: 10,
-                              // ),
-                              // Text(
-                              //   "No Resi",
-                              //   style: TextStyle(
-                              //       color: Color(0xFFADADAD),
-                              //       fontSize: 17,
-                              //       fontWeight: FontWeight.w400),
-                              // ),
-                              // SizedBox(
-                              //   height: 10,
-                              // ),
                               Text(
                                 "Alamat",
                                 style: TextStyle(
@@ -361,26 +276,6 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Text(
-                            //   "Kurir Rekomendasi - Reguler",
-                            //   style: TextStyle(
-                            //       color: Color(0xFF505050),
-                            //       fontSize: 17,
-                            //       fontWeight: FontWeight.w400),
-                            // ),
-                            // SizedBox(
-                            //   height: 10,
-                            // ),
-                            // Text(
-                            //   "DAS860DA-98273GH",
-                            //   style: TextStyle(
-                            //       color: Color(0xFF505050),
-                            //       fontSize: 17,
-                            //       fontWeight: FontWeight.w400),
-                            // ),
-                            // SizedBox(
-                            //   height: 10,
-                            // ),
                             Text(
                               "Firdaus",
                               style: TextStyle(
@@ -437,7 +332,7 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                       "Rincian Pembayaran",
                       style: TextStyle(
                         color: Color(0xFF505050),
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -448,18 +343,20 @@ class _DetailPemesananState extends State<DetailPemesanan> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Total Harga",
+                          "Total Belanja",
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600),
+                            color: Color(0xFF505050),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
-                          "Rp.36.000",
+                          formatPrice(widget.transaction['total_price']),
                           style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600),
+                            color: Color(0xFF505050),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),

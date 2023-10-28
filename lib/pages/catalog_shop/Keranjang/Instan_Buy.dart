@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:variegata_app/pages/catalog_shop/Alamat/Mini_map.dart';
 import 'package:variegata_app/pages/catalog_shop/Checkout/Checkout_kosong.dart';
 import 'dart:convert';
-import 'package:variegata_app/pages/catalog_shop/dashboard_catalog.dart';
 
 class Keranjang extends StatefulWidget {
   const Keranjang({Key? key}) : super(key: key);
@@ -260,8 +259,6 @@ class _KeranjangState extends State<Keranjang> {
         print("Error: ${response.statusCode}");
       }
     } else {
-      // Token tidak ditemukan di Shared Preferences, lakukan penanganan kesalahan atau arahkan pengguna ke halaman login
-      // Anda dapat menambahkan logika di sini sesuai kebutuhan aplikasi Anda.
     }
   }
 

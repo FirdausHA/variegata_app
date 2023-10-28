@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shimmer/shimmer.dart'; // Import pustaka shimmer
+import 'package:shimmer/shimmer.dart';
 import 'package:variegata_app/pages/Ulasan_Pembeli/Review/Rating.dart';
-import 'package:variegata_app/pages/Ulasan_Pembeli/Review/Review.dart';
 import 'package:variegata_app/pages/catalog_shop/Toko_Product/Detail_Toko.dart';
 
 class Ulasan extends StatefulWidget {

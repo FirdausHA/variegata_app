@@ -147,7 +147,7 @@ class _RiwayatPembelianState extends State<RiwayatPembelian> {
                                         height: 3,
                                       ),
                                       Text(
-                                        "12, Oktober 2023",
+                                        "27, Oktober 2023",
                                         style: TextStyle(
                                           color: Color(0xFFADADAD),
                                           fontSize: 15,
@@ -194,7 +194,7 @@ class _RiwayatPembelianState extends State<RiwayatPembelian> {
                               borderRadius: BorderRadius.circular(6),
                               child: Image(
                                 image: AssetImage(
-                                    "assets/img/produk-philodendron.png"),
+                                    "assets/img/dashboard/Wortel.jpg"),
                                 width: 47,
                                 height: 47,
                               ),
@@ -210,7 +210,7 @@ class _RiwayatPembelianState extends State<RiwayatPembelian> {
                                   Container(
                                     width: 260,
                                     child: Text(
-                                      'Tanaman Philodendron Monstera Deliciosa',
+                                      'Wortel Segar Asli Langsung dari perkebunan petani',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 15,
@@ -225,7 +225,7 @@ class _RiwayatPembelianState extends State<RiwayatPembelian> {
                                     height: 3,
                                   ),
                                   Text(
-                                    '4 barang',
+                                    '3 barang',
                                     style: TextStyle(
                                       color: Color(0xFFADADAD),
                                       fontSize: 13,
@@ -258,7 +258,7 @@ class _RiwayatPembelianState extends State<RiwayatPembelian> {
                                   height: 3,
                                 ),
                                 Text(
-                                  "Rp60.000",
+                                  "Rp.36.000",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 14,

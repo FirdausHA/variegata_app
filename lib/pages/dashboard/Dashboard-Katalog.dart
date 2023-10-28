@@ -35,29 +35,6 @@ class _KatalogShopState extends State<KatalogShop> {
     }
   }
 
-  Widget _buildShimmerProductCard() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Container(
-        width: 140,
-        height: 231,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: -4,
-              blurRadius: 14,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   final String Url = 'https://variegata.my.id/api/products/category/2';
   Future<List<dynamic>> fetchData() async {
     final response = await http.get(Uri.parse(Url));
@@ -250,28 +227,36 @@ class _KatalogShopState extends State<KatalogShop> {
                           child: FutureBuilder<List<dynamic>>(
                             future: fetchProducts(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                ); // Show loading indicator
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot.data?.length ?? 10,// You can set this to any number of items you want to show initially
+                                  itemBuilder: (context, index) {
+                                    return Shimmer.fromColors(
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(
+                                        width: 120,
+                                        height: 231,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        margin: EdgeInsets.only(left: 8),
+                                      ),
+                                    );
+                                  },
+                                );
                               } else if (snapshot.hasError) {
-                                return Center(
-                                    child:
-                                    Text('Data error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data!.isEmpty) {
-                                return Center(
-                                    child: Text('No data available.'));
+                                return Center(child:Text('Data error: ${snapshot.error}'));
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Center(child: Text('No data available.'));
                               } else {
                                 return Container(
                                   height: 231, // Height of the container
                                   child: ListView.builder(
-                                    scrollDirection:
-                                    Axis.horizontal, // Scroll horizontally
-                                    physics:
-                                    NeverScrollableScrollPhysics(), // Disable scrolling
-                                    itemCount: 3, // Use all available items
+                                    scrollDirection: Axis.horizontal, // Scroll horizontally
+                                    itemCount: snapshot.data!.length, // Use all available items
                                     itemBuilder: (context, index) {
                                       var product = snapshot.data![index];
                                       return Align(
@@ -282,12 +267,10 @@ class _KatalogShopState extends State<KatalogShop> {
                                             width: 120,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius:
-                                              BorderRadius.circular(5),
+                                              borderRadius: BorderRadius.circular(5),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.5),
+                                                  color: Colors.grey.withOpacity(0.5),
                                                   spreadRadius: -4,
                                                   blurRadius: 14,
                                                   offset: Offset(0, 2),
@@ -298,48 +281,33 @@ class _KatalogShopState extends State<KatalogShop> {
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailProduk(
-                                                            product: product),
+                                                  MaterialPageRoute(builder: (context) => DetailProduk(product: product),
                                                   ),
                                                 );
                                               },
                                               child: Column(
                                                 children: [
                                                   ClipRRect(
-                                                    borderRadius:
-                                                    BorderRadius.vertical(
-                                                      top: Radius.circular(5),
-                                                    ),
+                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(5),),
                                                     child: Image.network(
                                                       'https://variegata.my.id/storage/${product['image']}',
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Icon(
-                                                            Icons.error);
+                                                      errorBuilder: (context, error, stackTrace) {
+                                                        return Icon(Icons.error);
                                                       },
                                                       fit: BoxFit.cover,
                                                       width: double.infinity,
                                                       height: 110,
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 9,
-                                                  ),
+                                                  SizedBox(height: 9,),
                                                   Container(
-                                                    padding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 9),
+                                                    padding: EdgeInsets.symmetric(horizontal: 9),
                                                     child: Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
                                                           product['name'],
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          overflow: TextOverflow.ellipsis,
                                                           maxLines: 2,
                                                           style: TextStyle(
                                                             fontSize: 12,
@@ -347,40 +315,29 @@ class _KatalogShopState extends State<KatalogShop> {
                                                             FontWeight.w400,
                                                           ),
                                                         ),
-                                                        SizedBox(
-                                                          height: 9,
-                                                        ),
+                                                        SizedBox(height: 9,),
                                                         Text(
                                                           '\Rp.${product['price']}',
                                                           style: TextStyle(
                                                             fontSize: 13,
-                                                            fontWeight:
-                                                            FontWeight.w700,
+                                                            fontWeight: FontWeight.w700,
                                                           ),
                                                         ),
-                                                        SizedBox(
-                                                          height: 9,
-                                                        ),
+                                                        SizedBox(height: 9,),
                                                         Row(
                                                           children: [
                                                             Icon(
                                                               Icons.location_on,
-                                                              color: Color(
-                                                                  0xFFBBD6B8),
+                                                              color: Color(0xFFBBD6B8),
                                                               size: 15,
                                                             ),
-                                                            SizedBox(
-                                                              width: 2,
-                                                            ),
+                                                            SizedBox(width: 2,),
                                                             Text(
                                                               'Kudus',
                                                               style: TextStyle(
-                                                                color: Color(
-                                                                    0xFFADADAD),
+                                                                color: Color(0xFFADADAD),
                                                                 fontSize: 9,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w600,
+                                                                fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
                                                           ],
@@ -388,24 +345,17 @@ class _KatalogShopState extends State<KatalogShop> {
                                                         SizedBox(height: 2),
                                                         Row(
                                                           children: [
-                                                            Icon(
-                                                              Icons.star,
-                                                              color: Color(
-                                                                  0xFFFFC400),
+                                                            Icon(Icons.star,
+                                                              color: Color(0xFFFFC400),
                                                               size: 10,
                                                             ),
-                                                            SizedBox(
-                                                              width: 2,
-                                                            ),
+                                                            SizedBox(width: 2,),
                                                             Text(
                                                               '4.9 | Belum Terjual',
                                                               style: TextStyle(
-                                                                color: Color(
-                                                                    0xFFADADAD),
+                                                                color: Color(0xFFADADAD),
                                                                 fontSize: 9,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w600,
+                                                                fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
                                                           ],
@@ -415,18 +365,13 @@ class _KatalogShopState extends State<KatalogShop> {
                                                   ),
                                                   Spacer(),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
-                                                      Icon(
-                                                        Icons.more_horiz,
-                                                        color:
-                                                        Color(0xFFADADAD),
+                                                      Icon(Icons.more_horiz,
+                                                        color: Color(0xFFADADAD),
                                                         size: 20,
                                                       ),
-                                                      SizedBox(
-                                                        width: 5,
-                                                      ),
+                                                      SizedBox(width: 5,),
                                                     ],
                                                   ),
                                                 ],
@@ -503,28 +448,36 @@ class _KatalogShopState extends State<KatalogShop> {
                           child: FutureBuilder<List<dynamic>>(
                             future: fetchData(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                ); // Show loading indicator
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot.data?.length ?? 10,
+                                  itemBuilder: (context, index) {
+                                    return Shimmer.fromColors(
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(
+                                        width: 120,
+                                        height: 231,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        margin: EdgeInsets.only(left: 8),
+                                      ),
+                                    );
+                                  },
+                                );
                               } else if (snapshot.hasError) {
-                                return Center(
-                                    child:
-                                    Text('Data error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data!.isEmpty) {
-                                return Center(
-                                    child: Text('No data available.'));
+                                return Center( child: Text('Data error: ${snapshot.error}'));
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Center(child: Text('No data available.'));
                               } else {
                                 return Container(
                                   height: 231, // Height of the container
                                   child: ListView.builder(
-                                    scrollDirection:
-                                    Axis.horizontal, // Scroll horizontally
-                                    physics:
-                                    NeverScrollableScrollPhysics(), // Disable scrolling
-                                    itemCount: 3, // Use all available items
+                                    scrollDirection: Axis.horizontal, // Scroll horizontally
+                                    itemCount: snapshot.data!.length, // Use all available items
                                     itemBuilder: (context, index) {
                                       var product = snapshot.data![index];
                                       return Align(
@@ -538,9 +491,7 @@ class _KatalogShopState extends State<KatalogShop> {
                                               borderRadius:
                                               BorderRadius.circular(5),
                                               boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.5),
+                                                BoxShadow(color: Colors.grey.withOpacity(0.5),
                                                   spreadRadius: -4,
                                                   blurRadius: 14,
                                                   offset: Offset(0, 2),
@@ -551,48 +502,34 @@ class _KatalogShopState extends State<KatalogShop> {
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailProduk(
-                                                            product: product),
+                                                  MaterialPageRoute(builder: (context) => DetailProduk(product: product),
                                                   ),
                                                 );
                                               },
                                               child: Column(
                                                 children: [
                                                   ClipRRect(
-                                                    borderRadius:
-                                                    BorderRadius.vertical(
-                                                      top: Radius.circular(5),
+                                                    borderRadius: BorderRadius.vertical(top: Radius.circular(5),
                                                     ),
                                                     child: Image.network(
                                                       'https://variegata.my.id/storage/${product['image']}',
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Icon(
-                                                            Icons.error);
+                                                      errorBuilder: (context, error, stackTrace) {
+                                                        return Icon(Icons.error);
                                                       },
                                                       fit: BoxFit.cover,
                                                       width: double.infinity,
                                                       height: 110,
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 9,
-                                                  ),
+                                                  SizedBox(height: 9,),
                                                   Container(
-                                                    padding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 9),
+                                                    padding: EdgeInsets.symmetric(horizontal: 9),
                                                     child: Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
                                                           product['name'],
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          overflow: TextOverflow.ellipsis,
                                                           maxLines: 2,
                                                           style: TextStyle(
                                                             fontSize: 12,
@@ -600,9 +537,7 @@ class _KatalogShopState extends State<KatalogShop> {
                                                             FontWeight.w400,
                                                           ),
                                                         ),
-                                                        SizedBox(
-                                                          height: 9,
-                                                        ),
+                                                        SizedBox(height: 9,),
                                                         Text(
                                                           '\Rp.${product['price']}',
                                                           style: TextStyle(
@@ -616,24 +551,17 @@ class _KatalogShopState extends State<KatalogShop> {
                                                         ),
                                                         Row(
                                                           children: [
-                                                            Icon(
-                                                              Icons.location_on,
-                                                              color: Color(
-                                                                  0xFFBBD6B8),
+                                                            Icon(Icons.location_on,
+                                                              color: Color(0xFFBBD6B8),
                                                               size: 15,
                                                             ),
-                                                            SizedBox(
-                                                              width: 2,
-                                                            ),
+                                                            SizedBox(width: 2,),
                                                             Text(
                                                               'Kudus',
                                                               style: TextStyle(
-                                                                color: Color(
-                                                                    0xFFADADAD),
+                                                                color: Color(0xFFADADAD),
                                                                 fontSize: 9,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w600,
+                                                                fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
                                                           ],
@@ -641,24 +569,17 @@ class _KatalogShopState extends State<KatalogShop> {
                                                         SizedBox(height: 2),
                                                         Row(
                                                           children: [
-                                                            Icon(
-                                                              Icons.star,
-                                                              color: Color(
-                                                                  0xFFFFC400),
+                                                            Icon(Icons.star,
+                                                              color: Color(0xFFFFC400),
                                                               size: 10,
                                                             ),
-                                                            SizedBox(
-                                                              width: 2,
-                                                            ),
+                                                            SizedBox(width: 2,),
                                                             Text(
                                                               '4.9 | Belum Terjual',
                                                               style: TextStyle(
-                                                                color: Color(
-                                                                    0xFFADADAD),
+                                                                color: Color(0xFFADADAD),
                                                                 fontSize: 9,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w600,
+                                                                fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
                                                           ],
@@ -668,18 +589,14 @@ class _KatalogShopState extends State<KatalogShop> {
                                                   ),
                                                   Spacer(),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
                                                       Icon(
                                                         Icons.more_horiz,
-                                                        color:
-                                                        Color(0xFFADADAD),
+                                                        color: Color(0xFFADADAD),
                                                         size: 20,
                                                       ),
-                                                      SizedBox(
-                                                        width: 5,
-                                                      ),
+                                                      SizedBox(width: 5,),
                                                     ],
                                                   ),
                                                 ],
@@ -702,128 +619,6 @@ class _KatalogShopState extends State<KatalogShop> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget Products(String image, String title, String price) {
-    return Container(
-      child: Container(
-        width: 98,
-        height: 193,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.8), // Shadow color
-              spreadRadius:
-              0, // How far the shadow should spread from the Container
-              blurRadius: 4, // The intensity of the blur effect
-              offset: Offset(1, 1), // Offset of the shadow from the Container
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(5),
-              ),
-              child: Image(
-                image: AssetImage('assets/img/dashboard/$image'),
-                alignment: Alignment.topCenter,
-              ),
-            ),
-            SizedBox(
-              height: 9,
-            ),
-            Container(
-              width: 98,
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title.toString(),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    price.toString(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 7,
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Color(0xFFBBD6B8),
-                        size: 10,
-                      ),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text(
-                        'Kudus',
-                        style: TextStyle(
-                            color: Color(0xFFADADAD),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.star,
-                        color: Color(0xFFFFC400),
-                        size: 10,
-                      ),
-                      SizedBox(
-                        width: 2,
-                      ),
-                      Text(
-                        '4.9 | Terjual 14',
-                        style: TextStyle(
-                            color: Color(0xFFADADAD),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(
-                  Icons.more_horiz,
-                  color: Color(0xFFADADAD),
-                  size: 20,
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );

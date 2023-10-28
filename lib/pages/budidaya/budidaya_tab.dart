@@ -1050,11 +1050,10 @@ class BudidayaTab extends StatelessWidget {
                 ),
               ],
             ),
-
             Column(
               children: [
                 Material(
-                  elevation: 4, // Atur nilai elevation sesuai kebutuhan
+                  elevation: 4,
                   color: Color(0xFFFFF6A5),
                   child: Container(
                     width: MediaQuery.of(context).size.width,

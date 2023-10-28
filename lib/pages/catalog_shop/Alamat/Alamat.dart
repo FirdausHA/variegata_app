@@ -185,25 +185,25 @@ class _AlamatAllState extends State<AlamatAll> {
                                                       fontWeight: FontWeight.w600,
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    width: 3,
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      address['nomor_telepon'],
-                                                      style: TextStyle(
-                                                        color: Color(0xFF505050),
-                                                        fontSize: 17,
-                                                        fontWeight: FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                  ),
                                                 ],
                                               ),
                                             ),
                                           ),
                                           SizedBox(
                                             height: 10,
+                                          ),
+                                          SizedBox(
+                                            width: 3,
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              address['nomor_telepon'],
+                                              style: TextStyle(
+                                                color: Color(0xFF505050),
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
                                           ),
                                           Container(
                                             width: 240,

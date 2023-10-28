@@ -288,9 +288,6 @@ class _CartState extends State<Cart> {
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -484,7 +481,7 @@ class _CartState extends State<Cart> {
                                       ),
                                     ),
                                     Container(
-                                      width: 140,
+                                      width: 160,
                                       child: Text(
                                         cartItem['product']['name'],
                                         style: TextStyle(

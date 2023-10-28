@@ -55,11 +55,6 @@ class _DetailPlantState extends State<DetailPlant>
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: BackButton(
-          onPressed: () {
-            Navigator.pop(
-              context,
-            );
-          },
           color: Colors.black,
         ),
         backgroundColor: Colors.white,
@@ -99,7 +94,7 @@ class _DetailPlantState extends State<DetailPlant>
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 30),
                         child:  Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

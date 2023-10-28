@@ -165,7 +165,7 @@ class _CheckoutState extends State<Checkout> {
               ),
               Container(
                 width: 355,
-                height: 120,
+                height: 125,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   color: Colors.white,
@@ -185,37 +185,32 @@ class _CheckoutState extends State<Checkout> {
                           Padding(
                             padding: const EdgeInsets.only(top: 25),
                             child: Container(
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      widget.selectedAddress['nama'],
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    widget.selectedAddress['nama'],
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                    SizedBox(
-                                      width: 3,
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        widget.selectedAddress['nomor_telepon'],
-                                        style: TextStyle(
-                                          color: Color(0xFF505050),
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                           SizedBox(
-                            height: 10,
+                            width: 3,
+                          ),
+                          Center(
+                            child: Text(
+                              widget.selectedAddress['nomor_telepon'],
+                              style: TextStyle(
+                                color: Color(0xFF505050),
+                                fontSize: 17,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
                           ),
                           Container(
                             width: 240,

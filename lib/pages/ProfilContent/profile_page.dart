@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:variegata_app/Services/auth_services.dart';
 import 'package:variegata_app/auth/login_page.dart';
 import 'package:variegata_app/pages/ProfilContent/Riwayat.dart';
+import 'package:variegata_app/pages/ProfilContent/Transaksi.dart';
 import 'package:variegata_app/pages/catalog_shop/Alamat%20Utama/Alamat%20Utama%20Profile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -217,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RiwayatPembelian(),
+                              builder: (context) => TransactionListScreen(),
                             ),
                           );
                         },
